@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { selectActiveCase, selectLastResolution, useStore } from '../store';
-import type { ActionType, Case, LogEntry, OutcomeTier, Resolution } from '../types';
+import type { ActionType, Case, EmailThread, LogEntry, OutcomeTier, Resolution } from '../types';
 
 const ACTIONS: { id: ActionType; label: string; tone: string }[] = [
   { id: 'ignore', label: 'Ignore', tone: 'border-slate-700 text-slate-300' },
@@ -38,16 +38,23 @@ export function CaseBoard({ onContinue }: { onContinue: () => void }) {
 
 function ActiveCaseView({ caseDef }: { caseDef: Case }) {
   const logs = useStore((s) => s.logs);
+  const emails = useStore((s) => s.emails);
   const pinnedClueIds = useStore((s) => s.pinnedClueIds);
   const togglePin = useStore((s) => s.togglePin);
   const decide = useStore((s) => s.decide);
 
-  const pinned = logs.filter((l) => pinnedClueIds.includes(l.id));
+  const pinnedLogs = logs.filter((l) => pinnedClueIds.includes(l.id));
+  const pinnedEmails = emails.filter((e) => pinnedClueIds.includes(e.id));
+  const pinnedTotal = pinnedLogs.length + pinnedEmails.length;
 
   return (
     <div className="p-3 space-y-4">
-      <CaseHeader caseDef={caseDef} pinnedCount={pinned.length} />
-      <PinnedClues pinned={pinned} onUnpin={togglePin} />
+      <CaseHeader caseDef={caseDef} pinnedCount={pinnedTotal} />
+      <PinnedClues
+        pinnedLogs={pinnedLogs}
+        pinnedEmails={pinnedEmails}
+        onUnpin={togglePin}
+      />
       <DecisionPanel
         caseDef={caseDef}
         onDecide={(action) => decide(caseDef.id, action)}
@@ -69,45 +76,79 @@ function CaseHeader({ caseDef, pinnedCount }: { caseDef: Case; pinnedCount: numb
 }
 
 function PinnedClues({
-  pinned,
+  pinnedLogs,
+  pinnedEmails,
   onUnpin,
 }: {
-  pinned: LogEntry[];
+  pinnedLogs: LogEntry[];
+  pinnedEmails: EmailThread[];
   onUnpin: (id: string) => void;
 }) {
-  if (pinned.length === 0) {
+  if (pinnedLogs.length === 0 && pinnedEmails.length === 0) {
     return (
       <div className="border border-dashed border-slate-800 rounded p-4 text-center">
         <p className="text-xs text-slate-500">
-          No clues pinned. Open Logs and pin rows you find suspicious.
+          No clues pinned. Open Logs or Emails and pin items you find suspicious.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-2">
-      {pinned.map((l) => (
-        <div
-          key={l.id}
-          className="border border-amber-700/30 bg-amber-900/10 rounded p-2 font-mono text-[12px]"
-        >
-          <div className="flex gap-2 flex-wrap">
-            <span className="text-slate-500">{l.ts}</span>
-            <span className="text-amber-300">
-              {l.service}.{l.event}
-            </span>
-            <span className="text-slate-500 truncate">{l.user}</span>
+    <div className="space-y-3">
+      {pinnedLogs.length > 0 && (
+        <div className="space-y-2">
+          <div className="text-[10px] uppercase tracking-[0.2em] text-slate-600 font-mono px-1">
+            logs · {pinnedLogs.length}
           </div>
-          <div className="text-slate-400 mt-1 break-all">{l.detail}</div>
-          <button
-            onClick={() => onUnpin(l.id)}
-            className="mt-2 text-[10px] uppercase tracking-wider text-slate-500 active:text-slate-200"
-          >
-            unpin
-          </button>
+          {pinnedLogs.map((l) => (
+            <div
+              key={l.id}
+              className="border border-amber-700/30 bg-amber-900/10 rounded p-2 font-mono text-[12px]"
+            >
+              <div className="flex gap-2 flex-wrap">
+                <span className="text-slate-500">{l.ts}</span>
+                <span className="text-amber-300">
+                  {l.service}.{l.event}
+                </span>
+                <span className="text-slate-500 truncate">{l.user}</span>
+              </div>
+              <div className="text-slate-400 mt-1 break-all">{l.detail}</div>
+              <button
+                onClick={() => onUnpin(l.id)}
+                className="mt-2 text-[10px] uppercase tracking-wider text-slate-500 active:text-slate-200"
+              >
+                unpin
+              </button>
+            </div>
+          ))}
         </div>
-      ))}
+      )}
+      {pinnedEmails.length > 0 && (
+        <div className="space-y-2">
+          <div className="text-[10px] uppercase tracking-[0.2em] text-slate-600 font-mono px-1">
+            emails · {pinnedEmails.length}
+          </div>
+          {pinnedEmails.map((e) => (
+            <div
+              key={e.id}
+              className="border border-amber-700/30 bg-amber-900/10 rounded p-2 text-[12px]"
+            >
+              <div className="font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                {e.ts} · {e.fromName}
+              </div>
+              <div className="text-amber-300 text-sm leading-snug">{e.subject}</div>
+              <div className="text-slate-500 mt-1 text-[11px] font-mono">→ {e.to}</div>
+              <button
+                onClick={() => onUnpin(e.id)}
+                className="mt-2 text-[10px] uppercase tracking-wider font-mono text-slate-500 active:text-slate-200"
+              >
+                unpin
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

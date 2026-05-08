@@ -20,7 +20,7 @@ const surfaceLabel: Record<Surface, string> = {
   traffic: 'traffic',
 };
 
-export function TriageInbox({ onInvestigate }: { onInvestigate: () => void }) {
+export function TriageInbox({ onInvestigate }: { onInvestigate: (surface: Surface) => void }) {
   const alerts = useStore((s) => s.alerts);
   const triage = useStore((s) => s.triage);
   const attention = useStore((s) => s.attention);
@@ -42,7 +42,7 @@ export function TriageInbox({ onInvestigate }: { onInvestigate: () => void }) {
 
   const handleInvestigate = (a: Alert) => {
     triage(a.id, 'investigate');
-    onInvestigate();
+    onInvestigate(a.surface);
   };
 
   return (

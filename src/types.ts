@@ -20,6 +20,19 @@ export interface LogEntry {
   caseId: string | null;
 }
 
+export interface EmailThread {
+  id: string;
+  ts: string;
+  from: string;
+  fromName: string;
+  to: string;
+  subject: string;
+  preview: string;
+  body: string;
+  severity: Severity;
+  caseId: string | null;
+}
+
 export interface Alert {
   id: string;
   title: string;
@@ -68,6 +81,7 @@ export interface Day {
   attention: number;
   alerts: Alert[];
   logs: LogEntry[];
+  emails: EmailThread[];
   cases: Case[];
 }
 

@@ -58,6 +58,15 @@ export const day2: Day = {
       caseId: null,
       triaged: 'pending',
     },
+    {
+      id: 'd2-a7',
+      title: 'Marco asking eng-leads about side AWS',
+      surface: 'emails',
+      severity: 'info',
+      preview: 'is there a corp-blessed sandbox? — eng-leads thread',
+      caseId: 'case-002',
+      triaged: 'pending',
+    },
   ],
   logs: [
     {
@@ -161,6 +170,68 @@ export const day2: Day = {
       caseId: null,
     },
   ],
+  emails: [
+    {
+      id: 'd2-e1',
+      ts: '08:55:14',
+      from: 'it@helix.corp',
+      fromName: 'IT',
+      to: 'erin@helix.corp',
+      subject: 'Your new laptop is ready',
+      preview: 'Pickup tomorrow morning between 9 and 11.',
+      body: 'Hi Erin,\n\nYour replacement laptop is ready. Pickup tomorrow morning between 9 and 11.\n\nIT',
+      severity: 'info',
+      caseId: null,
+    },
+    {
+      id: 'd2-e2',
+      ts: '10:14:32',
+      from: 'marco@helix.corp',
+      fromName: 'Marco Rossi',
+      to: 'eng-leads@helix.corp',
+      subject: 'Quick Q on dev sandboxes',
+      preview: 'I have been spinning up my own AWS for prototypes — corp-blessed way?',
+      body: 'Hey leads,\n\nQuick question — what is the etiquette on side experiments? I have been spinning up my own AWS account for prototypes (paying out of pocket, expensing later). Is there a corp-blessed sandbox I should be using instead?\n\nWant to keep this above board.\n\nMarco',
+      severity: 'warn',
+      caseId: 'case-002',
+    },
+    {
+      id: 'd2-e3',
+      ts: '13:25:07',
+      from: 'pagerduty@helix.corp',
+      fromName: 'PagerDuty Digest',
+      to: 'sre@helix.corp',
+      subject: 'Daily on-call digest',
+      preview: '4 swaps today, 0 incidents. Healthy week.',
+      body: '4 on-call swaps today.\n0 incidents.\nHealthy week.\n\n— PagerDuty',
+      severity: 'info',
+      caseId: null,
+    },
+    {
+      id: 'd2-e4',
+      ts: '09:34:01',
+      from: 'finance-bot@helix.corp',
+      fromName: 'Finance Bot',
+      to: 'all-hands@helix.corp',
+      subject: 'Slack seat top-up complete',
+      preview: '8 seats added, $640 charged.',
+      body: 'Slack seats topped up by 8 this month. Total charge $640.\n\nFinance',
+      severity: 'info',
+      caseId: null,
+    },
+    {
+      id: 'd2-e5',
+      ts: '15:20:48',
+      from: 'eng-events@helix.corp',
+      fromName: 'Eng Events',
+      to: 'engineering@helix.corp',
+      subject: 'All-hands next Friday',
+      preview: 'CTO covering Q4 roadmap.',
+      body: 'Engineering all-hands next Friday at 2 PM. CTO will cover the Q4 roadmap. Logistics in the calendar invite.\n\n— Eng Events',
+      severity: 'info',
+      caseId: null,
+    },
+  ],
   cases: [
     {
       id: 'case-002',
@@ -169,16 +240,16 @@ export const day2: Day = {
       perpetrator: 'Marco Rossi · Engineering',
       perpetratorDept: 'engineering',
       briefing:
-        'Marco Rossi charged $45 to his corp card for an AWS account that is not Helix-owned. He created an IAM role that trusts an external account (842910335599), and 18MB of test data egressed to us-west-2 — a region Helix does not use. No production data appears to have moved. A policy violation, not yet a breach.',
-      requiredClueIds: ['d2-l3', 'd2-l5', 'd2-l8'],
+        'Marco Rossi created an IAM role that trusts an external AWS account, and 18MB of test data egressed to us-west-2 — a region Helix does not use. A casual email to eng-leads suggests this is an ongoing personal-AWS habit rather than a one-off. The $45 corp-card charge is the paper trail.',
+      requiredClueIds: ['d2-l5', 'd2-l8', 'd2-e2'],
       correctAction: 'warn',
       narratives: {
         vindicated:
-          "You sit Marco down with a sysadmin and walk through the egress and IAM logs. He's mortified. The role gets revoked, the account closed by EOD. Engineering runs a low-key post-mortem on how onboarding missed this. You spent thirty minutes and gained the team's respect.",
+          "You sit Marco down with a sysadmin and walk through the IAM trust policy, the us-west-2 egress, and his own email asking eng-leads about etiquette. He's mortified. The role gets revoked, the account closed by EOD. Engineering runs a low-key post-mortem on how onboarding missed this. You spent thirty minutes and gained the team's respect.",
         'right-partial':
           "You warn without the full evidence. Marco closes the account, but his manager doesn't fully understand what was at risk. Looks like Governance is chasing shadows. Mild trust dip.",
         lucky:
-          'You warn on a hunch, before pulling the IAM trust policy. Marco caves anyway. It worked, but the board flags that you delivered a verdict without the underlying work.',
+          'You warn on a hunch, before pulling the IAM trust policy or the email. Marco caves anyway. It worked, but the board flags that you delivered a verdict without the underlying work.',
         'missed-soft':
           "Three months later, Marco's 'side garage' has nightly snapshots of the staging database in his personal account. He doesn't share them, but a security audit catches the bucket and asks why this kept running for ninety days.",
         overreacted:

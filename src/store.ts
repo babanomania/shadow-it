@@ -5,6 +5,7 @@ import type {
   ActionType,
   Alert,
   Case,
+  EmailThread,
   LogEntry,
   OutcomeTier,
   Resolution,
@@ -101,6 +102,7 @@ interface State {
   morale: Record<string, number>;
   alerts: Alert[];
   logs: LogEntry[];
+  emails: EmailThread[];
   cases: Case[];
   pinnedClueIds: string[];
   resolutions: Resolution[];
@@ -122,6 +124,7 @@ const buildDayState = (dayNumber: number) => {
       attentionMax: 0,
       alerts: [] as Alert[],
       logs: [] as LogEntry[],
+      emails: [] as EmailThread[],
       cases: [] as Case[],
     };
   }
@@ -131,6 +134,7 @@ const buildDayState = (dayNumber: number) => {
     attentionMax: day.attention,
     alerts: day.alerts,
     logs: day.logs,
+    emails: day.emails,
     cases: day.cases,
   };
 };

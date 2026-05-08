@@ -58,6 +58,15 @@ export const day1: Day = {
       caseId: 'case-001',
       triaged: 'pending',
     },
+    {
+      id: 'd1-a7',
+      title: 'Outbound email to personal address',
+      surface: 'emails',
+      severity: 'warn',
+      preview: 'priya@helix.corp → personalmail.com — re: customer data',
+      caseId: 'case-001',
+      triaged: 'pending',
+    },
   ],
   logs: [
     {
@@ -161,6 +170,68 @@ export const day1: Day = {
       caseId: null,
     },
   ],
+  emails: [
+    {
+      id: 'd1-e1',
+      ts: '08:30:11',
+      from: 'billing@cloudfront.example',
+      fromName: 'CloudFront Billing',
+      to: 'finance@helix.corp',
+      subject: 'Annual renewal — quote attached',
+      preview: 'Your contract is up for renewal in 60 days. Quote attached.',
+      body: 'Hi team,\n\nYour annual contract is up for renewal in 60 days. Quote attached.\n\nLet me know if you would like to discuss volume tiers.\n\nBest,\nClaire',
+      severity: 'info',
+      caseId: null,
+    },
+    {
+      id: 'd1-e2',
+      ts: '14:08:51',
+      from: 'priya@helix.corp',
+      fromName: 'Priya Shah',
+      to: 'priya.shah.contractor@personalmail.com',
+      subject: 'Customer pain-points draft',
+      preview: 'Got the AI to organize customer pain-points by theme. Output attached.',
+      body: 'Hey,\n\nFinally got the AI tool to spit out the rewrite I was looking for. I dumped the customer pain-points spreadsheet into Claude and asked it to organize them into themes. Output is attached.\n\nLet me know what you think — happy to share more if useful for your project.\n\n— P',
+      severity: 'warn',
+      caseId: 'case-001',
+    },
+    {
+      id: 'd1-e3',
+      ts: '10:22:01',
+      from: 'it-security@helix.corp',
+      fromName: 'IT Security',
+      to: 'all-hands@helix.corp',
+      subject: 'Q3 phishing reminder',
+      preview: 'Reminder we run phishing exercises this quarter.',
+      body: 'Hi everyone,\n\nFriendly reminder that we will be running phishing exercises this quarter. If you receive a suspicious email asking for credentials, please report it via #it-help.\n\nThanks,\nIT',
+      severity: 'info',
+      caseId: null,
+    },
+    {
+      id: 'd1-e4',
+      ts: '11:45:33',
+      from: 'carol@helix.corp',
+      fromName: 'Carol Vance',
+      to: 'marketing-leads@helix.corp',
+      subject: 'Re: Q3 OKR draft',
+      preview: 'Some overlap between brand and growth on the awareness target.',
+      body: 'Folks,\n\nI am seeing some overlap between brand and growth on the awareness target. Let us sync at the staff meeting Friday.\n\nCarol',
+      severity: 'info',
+      caseId: null,
+    },
+    {
+      id: 'd1-e5',
+      ts: '14:18:44',
+      from: 'sam@helix.corp',
+      fromName: 'Sam Ortiz',
+      to: 'marketing@helix.corp',
+      subject: 'AI tools — what is the team using?',
+      preview: 'Quick poll. Anyone using AI for content drafts?',
+      body: 'Quick poll — anyone using AI for content drafts? I have been playing with a few and would love to compare notes. Reply or :raise_hand: in #marketing.\n\nSam',
+      severity: 'info',
+      caseId: null,
+    },
+  ],
   cases: [
     {
       id: 'case-001',
@@ -169,18 +240,18 @@ export const day1: Day = {
       perpetrator: 'Priya Shah · Marketing',
       perpetratorDept: 'marketing',
       briefing:
-        'A marketing service account exported the customers table at midday and immediately uploaded 4.2GB to an LLM endpoint outside the corp network. Two days earlier, marketing expensed a personal-tier subscription to that vendor.',
-      requiredClueIds: ['d1-l2', 'd1-l6', 'd1-l7'],
+        'A marketing service account exported the customers table at midday and immediately uploaded 4.2GB to an LLM endpoint outside the corp network. A separate email thread shows Priya forwarding AI-organized customer data to a non-corp address. Two days earlier, marketing expensed a personal-tier subscription to the same vendor.',
+      requiredClueIds: ['d1-l6', 'd1-l7', 'd1-e2'],
       correctAction: 'escalate',
       narratives: {
         vindicated:
-          'Legal opens a CCPA review. Priya is placed on leave pending investigation. Marketing morale tanks, but the export logs and egress capture make the case airtight. Two other VPs quietly book one-on-ones to check their own teams.',
+          'Legal opens a CCPA review. Priya is placed on leave pending investigation. Marketing morale tanks, but the export logs, egress capture, and the email forwarding chain make the case airtight. Two other VPs quietly book one-on-ones to check their own teams.',
         'right-partial':
-          "You escalate without the full chain. Legal can't confirm data actually left the building, so it gets routed as an HR matter — coaching, not breach response. Board acknowledges the instinct, flags the paperwork.",
+          "You escalate without the full chain. Legal can't confirm the data actually left the building, so it gets routed as an HR matter — coaching, not breach response. Board acknowledges the instinct, flags the paperwork.",
         lucky:
           'You escalate on instinct, before pinning the evidence. Legal finds the trail themselves and you get partial credit. Board notes you "arrived at the right answer through unclear means."',
         'missed-soft':
-          "Three months later, a competitor's pitch deck quotes Helix's customer pain-points verbatim. Sales loses two enterprise deals. Forensic review traces the leak to that 4.2GB POST you didn't act decisively on.",
+          "Three months later, a competitor's pitch deck quotes Helix's customer pain-points verbatim. Sales loses two enterprise deals. Forensic review traces the leak to that 4.2GB POST and a forwarded email you didn't act decisively on.",
         overreacted:
           "You move to terminate before legal review. Priya sues for wrongful termination and wins on procedure. The board didn't disagree with your read — they disagreed with you skipping due process. Marketing now treats Governance as the threat.",
       },
