@@ -24,7 +24,18 @@ Each call shifts board trust, department morale, and the company-wide breach ris
 
 ## Status
 
-Pre-prototype. Full design in [`SPEC.md`](SPEC.md). MVP scope: ~1–2 weeks of solo work.
+Early prototype. Vite + React + Tailwind scaffold is up. First vertical slice in: triage inbox, logs surface with severity filter and pin-to-case, case board showing pinned clues, attention budget. Decision UI, persistence, and the other surfaces are next.
+
+Full design in [`SPEC.md`](SPEC.md). Operating notes for Claude Code in [`CLAUDE.md`](CLAUDE.md).
+
+## Run it
+
+```bash
+npm install
+npm run dev
+```
+
+Open the dev URL on your phone or in a narrow browser window. The app caps at 28rem wide — it's portrait-only on purpose.
 
 ## Stack (planned)
 
@@ -40,14 +51,16 @@ Hand-authoring detective cases is expensive. Procedural generation at *runtime* 
 ## Roadmap
 
 - [x] Game design spec
-- [ ] Paper prototype — index-card playtests of the cross-referencing puzzle
-- [ ] Vite + Tailwind scaffold
-- [ ] Logs surface + triage inbox
-- [ ] First 5 hand-authored cases
+- [x] Vite + Tailwind scaffold
+- [x] Triage inbox
+- [x] Logs surface (filter + pin-to-case)
+- [x] Case board (pinned clues view)
+- [ ] Decision UI (ignore / warn / escalate / terminate) with consequences
+- [ ] IndexedDB persistence
+- [ ] End-of-day debrief
+- [ ] First 5 hand-authored cases (currently 1 seeded)
 - [ ] Gemma case-authoring pipeline
 - [ ] Emails surface
-- [ ] Case board with pin/link
-- [ ] End-of-day debrief
 - [ ] PWA polish + deploy
 
 ## License
