@@ -24,7 +24,7 @@ Each call shifts board trust, department morale, and the company-wide breach ris
 
 ## Status
 
-Early prototype. Vite + React + Tailwind scaffold is up. The core loop runs end-to-end on one seeded case: triage alerts, pin clues from logs, decide (ignore / warn / escalate / terminate), receive a verdict tier and narrative aftermath. Trust, risk, and per-department morale meters move on every decision. State persists to IndexedDB — close the tab, reopen, you're back where you left off. Next: more cases and a day-end debrief flow.
+Early prototype. The full quarter runs end-to-end: triage → pin → decide → debrief → next day, across five hand-authored cases (shadow AI, shadow cloud, accidental leak, exposed API, insider exfil). Meters compound across days. Trust at zero or risk at one hundred ends the run. Survive all five days for a win screen. State persists to IndexedDB.
 
 Full design in [`SPEC.md`](SPEC.md). Operating notes for Claude Code in [`CLAUDE.md`](CLAUDE.md).
 
@@ -57,6 +57,8 @@ Hand-authoring detective cases is expensive. Procedural generation at *runtime* 
 - [x] Case board (pinned clues view)
 - [x] Decision UI + verdict logic (trust / risk / morale meters, 5 outcome tiers)
 - [x] IndexedDB persistence (rehydrate on load, reset action behind confirm)
+- [x] Five hand-authored cases (one per day, archetypes: shadow-ai, shadow-cloud, leak-accidental, exposed-api, insider-exfil)
+- [x] Day-end flow + game-over (trust 0 / risk 100) + win (survive 5 days)
 - [ ] End-of-day debrief
 - [ ] First 5 hand-authored cases (currently 1 seeded)
 - [ ] Gemma case-authoring pipeline

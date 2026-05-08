@@ -53,6 +53,7 @@ export interface Case {
 
 export interface Resolution {
   caseId: string;
+  day: number;
   action: ActionType;
   verdictTier: VerdictTier;
   outcomeTier: OutcomeTier;
@@ -61,3 +62,13 @@ export interface Resolution {
   moraleDeltas: Record<string, number>;
   narrative: string;
 }
+
+export interface Day {
+  number: number;
+  attention: number;
+  alerts: Alert[];
+  logs: LogEntry[];
+  cases: Case[];
+}
+
+export type Status = 'playing' | 'day-end' | 'game-over' | 'won';

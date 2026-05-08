@@ -6,12 +6,15 @@ import { TriageInbox } from './components/TriageInbox';
 import { LogsSurface } from './components/LogsSurface';
 import { CaseBoard } from './components/CaseBoard';
 import { SurfaceStub } from './components/SurfaceStub';
+import { GameOverScreen } from './components/GameOverScreen';
+import { WinScreen } from './components/WinScreen';
 
 export type Tab = 'triage' | 'logs' | 'emails' | 'cases';
 
 export function App() {
   const [hydrated, setHydrated] = useState(useStore.persist.hasHydrated());
   const [tab, setTab] = useState<Tab>('triage');
+  const status = useStore((s) => s.status);
 
   useEffect(() => {
     if (useStore.persist.hasHydrated()) setHydrated(true);
@@ -32,6 +35,9 @@ export function App() {
     );
   }
 
+  if (status === 'game-over') return <GameOverScreen />;
+  if (status === 'won') return <WinScreen />;
+
   return (
     <div className="flex h-full max-w-md mx-auto flex-col bg-[#0b1220] border-x border-slate-900">
       <TopBar />
@@ -44,7 +50,7 @@ export function App() {
             blurb="Threaded inbox lens. Coming after logs lands."
           />
         )}
-        {tab === 'cases' && <CaseBoard />}
+        {tab === 'cases' && <CaseBoard onContinue={() => setTab('triage')} />}
       </main>
       <BottomNav tab={tab} onChange={setTab} />
     </div>

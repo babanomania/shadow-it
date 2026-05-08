@@ -8,9 +8,10 @@ import type {
   LogEntry,
   OutcomeTier,
   Resolution,
+  Status,
   VerdictTier,
 } from './types';
-import { alerts as seedAlerts, cases as seedCases, logs as seedLogs } from './data/day1';
+import { days } from './data';
 
 type TriageAction = 'investigate' | 'dismiss';
 
@@ -27,6 +28,7 @@ export function evaluate(
   caseDef: Case,
   pinnedClueIds: string[],
   action: ActionType,
+  day: number,
 ): Resolution {
   const matched = pinnedClueIds.filter((id) => caseDef.requiredClueIds.includes(id)).length;
   const total = caseDef.requiredClueIds.length;
@@ -78,6 +80,7 @@ export function evaluate(
 
   return {
     caseId: caseDef.id,
+    day,
     action,
     verdictTier,
     outcomeTier,
@@ -100,25 +103,45 @@ interface State {
   cases: Case[];
   pinnedClueIds: string[];
   resolutions: Resolution[];
+  status: Status;
 
   triage: (id: string, action: TriageAction) => void;
   togglePin: (logId: string) => void;
   decide: (caseId: string, action: ActionType) => void;
+  nextDay: () => void;
   reset: () => void;
 }
 
+const buildDayState = (dayNumber: number) => {
+  const day = days[dayNumber - 1];
+  if (!day) {
+    return {
+      day: dayNumber,
+      attention: 0,
+      attentionMax: 0,
+      alerts: [],
+      logs: [],
+      cases: [],
+    };
+  }
+  return {
+    day: day.number,
+    attention: day.attention,
+    attentionMax: day.attention,
+    alerts: day.alerts,
+    logs: day.logs,
+    cases: day.cases,
+  };
+};
+
 const buildInitialState = () => ({
-  day: 1,
-  attention: 10,
-  attentionMax: 10,
+  ...buildDayState(1),
   trust: 60,
   risk: 20,
   morale: seedMorale(),
-  alerts: seedAlerts,
-  logs: seedLogs,
-  cases: seedCases,
   pinnedClueIds: [] as string[],
   resolutions: [] as Resolution[],
+  status: 'playing' as Status,
 });
 
 const idbStorage: StateStorage = {
@@ -162,19 +185,33 @@ export const useStore = create<State>()(
           if (!caseDef) return s;
           if (s.resolutions.some((r) => r.caseId === caseId)) return s;
 
-          const resolution = evaluate(caseDef, s.pinnedClueIds, action);
+          const resolution = evaluate(caseDef, s.pinnedClueIds, action, s.day);
 
           const nextMorale = { ...s.morale };
           for (const [dept, delta] of Object.entries(resolution.moraleDeltas)) {
             nextMorale[dept] = clamp((nextMorale[dept] ?? 70) + delta, 0, 100);
           }
 
+          const nextTrust = clamp(s.trust + resolution.trustDelta, 0, 100);
+          const nextRisk = clamp(s.risk + resolution.riskDelta, 0, 100);
+
+          const newResolutions = [...s.resolutions, resolution];
+          const allResolved = s.cases.every((c) =>
+            newResolutions.some((r) => r.caseId === c.id),
+          );
+
+          let nextStatus: Status;
+          if (nextTrust <= 0 || nextRisk >= 100) nextStatus = 'game-over';
+          else if (allResolved) nextStatus = 'day-end';
+          else nextStatus = 'playing';
+
           return {
-            resolutions: [...s.resolutions, resolution],
-            trust: clamp(s.trust + resolution.trustDelta, 0, 100),
-            risk: clamp(s.risk + resolution.riskDelta, 0, 100),
+            resolutions: newResolutions,
+            trust: nextTrust,
+            risk: nextRisk,
             morale: nextMorale,
             pinnedClueIds: [],
+            status: nextStatus,
             alerts: s.alerts.map((a) =>
               a.caseId === caseId && a.triaged === 'pending'
                 ? { ...a, triaged: 'dismissed' }
@@ -183,12 +220,25 @@ export const useStore = create<State>()(
           };
         }),
 
+      nextDay: () =>
+        set((s) => {
+          const next = s.day + 1;
+          if (next > days.length) {
+            return { status: 'won' as Status };
+          }
+          return {
+            ...buildDayState(next),
+            pinnedClueIds: [],
+            status: 'playing' as Status,
+          };
+        }),
+
       reset: () => set(buildInitialState()),
     }),
     {
       name: 'shadow-it/v1',
       storage: createJSONStorage(() => idbStorage),
-      version: 1,
+      version: 2,
     },
   ),
 );
@@ -198,3 +248,8 @@ export const selectActiveCase = (s: State): Case | null =>
 
 export const selectLastResolution = (s: State): Resolution | null =>
   s.resolutions[s.resolutions.length - 1] ?? null;
+
+export const selectCurrentDayResolution = (s: State): Resolution | null => {
+  const forDay = s.resolutions.filter((r) => r.day === s.day);
+  return forDay[forDay.length - 1] ?? null;
+};

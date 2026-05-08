@@ -9,18 +9,17 @@ const ACTIONS: { id: ActionType; label: string; tone: string }[] = [
   { id: 'terminate', label: 'Terminate', tone: 'border-red-700/50 text-red-300' },
 ];
 
-export function CaseBoard() {
-  const logs = useStore((s) => s.logs);
-  const pinnedClueIds = useStore((s) => s.pinnedClueIds);
-  const togglePin = useStore((s) => s.togglePin);
-  const decide = useStore((s) => s.decide);
-  const activeCase = useStore(selectActiveCase);
+export function CaseBoard({ onContinue }: { onContinue: () => void }) {
+  const status = useStore((s) => s.status);
   const lastResolution = useStore(selectLastResolution);
+  const activeCase = useStore(selectActiveCase);
   const cases = useStore((s) => s.cases);
 
-  if (!activeCase && lastResolution) {
+  if (status === 'day-end' && lastResolution) {
     const caseDef = cases.find((c) => c.id === lastResolution.caseId);
-    if (caseDef) return <ResolutionView resolution={lastResolution} caseDef={caseDef} />;
+    if (caseDef) {
+      return <ResolutionView resolution={lastResolution} caseDef={caseDef} onContinue={onContinue} />;
+    }
   }
 
   if (!activeCase) {
@@ -34,15 +33,24 @@ export function CaseBoard() {
     );
   }
 
+  return <ActiveCaseView caseDef={activeCase} />;
+}
+
+function ActiveCaseView({ caseDef }: { caseDef: Case }) {
+  const logs = useStore((s) => s.logs);
+  const pinnedClueIds = useStore((s) => s.pinnedClueIds);
+  const togglePin = useStore((s) => s.togglePin);
+  const decide = useStore((s) => s.decide);
+
   const pinned = logs.filter((l) => pinnedClueIds.includes(l.id));
 
   return (
     <div className="p-3 space-y-4">
-      <CaseHeader caseDef={activeCase} pinnedCount={pinned.length} />
+      <CaseHeader caseDef={caseDef} pinnedCount={pinned.length} />
       <PinnedClues pinned={pinned} onUnpin={togglePin} />
       <DecisionPanel
-        caseDef={activeCase}
-        onDecide={(action) => decide(activeCase.id, action)}
+        caseDef={caseDef}
+        onDecide={(action) => decide(caseDef.id, action)}
       />
     </div>
   );
@@ -122,8 +130,7 @@ function DecisionPanel({
         </div>
         <p className="text-sm text-slate-300 mb-1">
           <span className={`font-mono uppercase ${meta.tone.split(' ')[1]}`}>{meta.label}</span>{' '}
-          on{' '}
-          <span className="text-slate-100">{caseDef.title}</span>?
+          on <span className="text-slate-100">{caseDef.title}</span>?
         </p>
         <p className="text-xs text-slate-500 mb-3">
           You can&apos;t take this back. Pinned clues become your evidence of record.
@@ -188,12 +195,16 @@ const OUTCOME_TONE: Record<OutcomeTier, string> = {
 function ResolutionView({
   resolution,
   caseDef,
+  onContinue,
 }: {
   resolution: Resolution;
   caseDef: Case;
+  onContinue: () => void;
 }) {
-  const reset = useStore((s) => s.reset);
-  const [confirmReset, setConfirmReset] = useState(false);
+  const day = useStore((s) => s.day);
+  const totalDays = 5;
+  const nextDay = useStore((s) => s.nextDay);
+  const isLastDay = day >= totalDays;
 
   return (
     <div className="p-4 space-y-4">
@@ -201,7 +212,7 @@ function ResolutionView({
         className={`border rounded-lg p-3 ${OUTCOME_TONE[resolution.outcomeTier]} bg-slate-900/40`}
       >
         <div className="text-[10px] uppercase tracking-[0.2em] font-mono mb-1 opacity-70">
-          verdict
+          verdict · day {resolution.day}
         </div>
         <div className="text-sm font-mono uppercase tracking-wider">
           {OUTCOME_LABEL[resolution.outcomeTier]}
@@ -231,43 +242,15 @@ function ResolutionView({
         </div>
       </div>
 
-      <p className="text-[11px] text-slate-600 text-center font-mono uppercase tracking-wider">
-        end of day · debrief screen lands next
-      </p>
-
-      <div className="border-t border-slate-900 pt-3">
-        {confirmReset ? (
-          <div className="space-y-2">
-            <p className="text-[11px] text-slate-500 text-center font-mono uppercase tracking-wider">
-              wipe save and start over?
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setConfirmReset(false)}
-                className="py-2 text-[11px] uppercase tracking-wider text-slate-400 border border-slate-800 rounded active:bg-slate-800/50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  reset();
-                  setConfirmReset(false);
-                }}
-                className="py-2 text-[11px] uppercase tracking-wider text-red-300 border border-red-700/40 rounded active:bg-red-900/30"
-              >
-                Confirm reset
-              </button>
-            </div>
-          </div>
-        ) : (
-          <button
-            onClick={() => setConfirmReset(true)}
-            className="w-full py-2 text-[10px] uppercase tracking-[0.2em] text-slate-600 active:text-slate-300 font-mono"
-          >
-            reset save
-          </button>
-        )}
-      </div>
+      <button
+        onClick={() => {
+          nextDay();
+          onContinue();
+        }}
+        className="w-full py-3 text-[11px] uppercase tracking-[0.2em] text-amber-300 border border-amber-700/40 rounded font-mono active:bg-amber-900/30"
+      >
+        {isLastDay ? 'wrap the quarter' : `advance to day ${day + 1}`}
+      </button>
     </div>
   );
 }
