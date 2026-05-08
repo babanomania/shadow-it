@@ -62,7 +62,7 @@ Hand-authoring detective cases is expensive. Procedural generation at *runtime* 
 - [ ] Gemma case-authoring pipeline
 - [ ] Emails surface (second investigation lens for cross-referencing)
 - [ ] Expenses + Traffic surfaces (currently noise-only — referenced by alerts, no dedicated UI)
-- [ ] Persistence schema — partialize so content updates flow to returning players
+- [x] Persistence schema — partialize so content updates flow to returning players
 - [ ] PWA polish + deploy
 - [ ] Swipe gestures for triage (mobile polish — buttons-only for now)
 
