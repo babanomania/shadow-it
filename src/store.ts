@@ -14,6 +14,7 @@ import type {
 import { days } from './data';
 
 type TriageAction = 'investigate' | 'dismiss';
+type AlertOutcome = 'investigated' | 'dismissed';
 
 const ACTION_ORDER: ActionType[] = ['ignore', 'warn', 'escalate', 'terminate'];
 
@@ -119,9 +120,9 @@ const buildDayState = (dayNumber: number) => {
       day: dayNumber,
       attention: 0,
       attentionMax: 0,
-      alerts: [],
-      logs: [],
-      cases: [],
+      alerts: [] as Alert[],
+      logs: [] as LogEntry[],
+      cases: [] as Case[],
     };
   }
   return {
@@ -143,6 +144,37 @@ const buildInitialState = () => ({
   resolutions: [] as Resolution[],
   status: 'playing' as Status,
 });
+
+const triageActionsFrom = (alerts: Alert[]): Record<string, AlertOutcome> => {
+  const acc: Record<string, AlertOutcome> = {};
+  for (const a of alerts) {
+    if (a.triaged !== 'pending') acc[a.id] = a.triaged;
+  }
+  return acc;
+};
+
+const applyTriageActions = (
+  alerts: Alert[],
+  triageActions: Record<string, AlertOutcome> | undefined,
+): Alert[] => {
+  if (!triageActions) return alerts;
+  return alerts.map((a) => ({
+    ...a,
+    triaged: triageActions[a.id] ?? a.triaged,
+  }));
+};
+
+type PersistedShape = {
+  day: number;
+  attention: number;
+  trust: number;
+  risk: number;
+  morale: Record<string, number>;
+  pinnedClueIds: string[];
+  resolutions: Resolution[];
+  status: Status;
+  triageActions: Record<string, AlertOutcome>;
+};
 
 const idbStorage: StateStorage = {
   getItem: async (name) => {
@@ -238,7 +270,46 @@ export const useStore = create<State>()(
     {
       name: 'shadow-it/v1',
       storage: createJSONStorage(() => idbStorage),
-      version: 2,
+      version: 3,
+      partialize: (state): PersistedShape => ({
+        day: state.day,
+        attention: state.attention,
+        trust: state.trust,
+        risk: state.risk,
+        morale: state.morale,
+        pinnedClueIds: state.pinnedClueIds,
+        resolutions: state.resolutions,
+        status: state.status,
+        triageActions: triageActionsFrom(state.alerts),
+      }),
+      merge: (persisted, current) => {
+        const p = (persisted as Partial<PersistedShape> | null) ?? {};
+        const dayNum = typeof p.day === 'number' ? p.day : current.day;
+        const dayContent = buildDayState(dayNum);
+        return {
+          ...current,
+          ...dayContent,
+          attention:
+            typeof p.attention === 'number' ? p.attention : dayContent.attention,
+          alerts: applyTriageActions(dayContent.alerts, p.triageActions),
+          trust: typeof p.trust === 'number' ? p.trust : current.trust,
+          risk: typeof p.risk === 'number' ? p.risk : current.risk,
+          morale: p.morale ?? current.morale,
+          pinnedClueIds: p.pinnedClueIds ?? current.pinnedClueIds,
+          resolutions: p.resolutions ?? current.resolutions,
+          status: p.status ?? current.status,
+        };
+      },
+      migrate: (persistedState, version) => {
+        if (version === 2 && persistedState && typeof persistedState === 'object') {
+          const old = persistedState as { alerts?: Alert[] } & Record<string, unknown>;
+          return {
+            ...old,
+            triageActions: triageActionsFrom(old.alerts ?? []),
+          };
+        }
+        return persistedState;
+      },
     },
   ),
 );
