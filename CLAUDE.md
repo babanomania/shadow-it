@@ -11,7 +11,7 @@ A mobile-browser detective/strategy game. Player is head of governance & securit
 - **Delivery**: static PWA. No native app, no backend in v1.
 - **Stack**: React + Vite + Tailwind, Zustand for state, IndexedDB (`idb-keyval`) for persistence.
 - **Hosting**: Cloudflare Pages or Vercel.
-- **Cases**: hand-curated JSON in the repo. LLM (Gemma 3n, locally) is used at *authoring time* to draft candidates, not at runtime.
+- **Cases**: hand-curated JSON in the repo. LLM (Gemma 4 E4B, locally) is used at *authoring time* to draft candidates, not at runtime.
 - **UX**: portrait only, one-thumb operation, dark mode default. No twitch timers.
 - **Aesthetic**: terminal-meets-corporate. Mono for data, sans for chrome. Restrained palette (slate, amber, red, green).
 
