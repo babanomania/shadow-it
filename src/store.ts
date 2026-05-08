@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
+import { del as idbDel, get as idbGet, set as idbSet } from 'idb-keyval';
 import type {
   ActionType,
   Alert,
@@ -102,9 +104,10 @@ interface State {
   triage: (id: string, action: TriageAction) => void;
   togglePin: (logId: string) => void;
   decide: (caseId: string, action: ActionType) => void;
+  reset: () => void;
 }
 
-export const useStore = create<State>((set) => ({
+const buildInitialState = () => ({
   day: 1,
   attention: 10,
   attentionMax: 10,
@@ -114,51 +117,81 @@ export const useStore = create<State>((set) => ({
   alerts: seedAlerts,
   logs: seedLogs,
   cases: seedCases,
-  pinnedClueIds: [],
-  resolutions: [],
+  pinnedClueIds: [] as string[],
+  resolutions: [] as Resolution[],
+});
 
-  triage: (id, action) =>
-    set((s) => ({
-      alerts: s.alerts.map((a) =>
-        a.id === id
-          ? { ...a, triaged: action === 'investigate' ? 'investigated' : 'dismissed' }
-          : a,
-      ),
-      attention: action === 'investigate' ? Math.max(0, s.attention - 1) : s.attention,
-    })),
+const idbStorage: StateStorage = {
+  getItem: async (name) => {
+    const value = await idbGet<string>(name);
+    return value ?? null;
+  },
+  setItem: async (name, value) => {
+    await idbSet(name, value);
+  },
+  removeItem: async (name) => {
+    await idbDel(name);
+  },
+};
 
-  togglePin: (logId) =>
-    set((s) => ({
-      pinnedClueIds: s.pinnedClueIds.includes(logId)
-        ? s.pinnedClueIds.filter((id) => id !== logId)
-        : [...s.pinnedClueIds, logId],
-    })),
+export const useStore = create<State>()(
+  persist(
+    (set) => ({
+      ...buildInitialState(),
 
-  decide: (caseId, action) =>
-    set((s) => {
-      const caseDef = s.cases.find((c) => c.id === caseId);
-      if (!caseDef) return s;
-      if (s.resolutions.some((r) => r.caseId === caseId)) return s;
+      triage: (id, action) =>
+        set((s) => ({
+          alerts: s.alerts.map((a) =>
+            a.id === id
+              ? { ...a, triaged: action === 'investigate' ? 'investigated' : 'dismissed' }
+              : a,
+          ),
+          attention: action === 'investigate' ? Math.max(0, s.attention - 1) : s.attention,
+        })),
 
-      const resolution = evaluate(caseDef, s.pinnedClueIds, action);
+      togglePin: (logId) =>
+        set((s) => ({
+          pinnedClueIds: s.pinnedClueIds.includes(logId)
+            ? s.pinnedClueIds.filter((id) => id !== logId)
+            : [...s.pinnedClueIds, logId],
+        })),
 
-      const nextMorale = { ...s.morale };
-      for (const [dept, delta] of Object.entries(resolution.moraleDeltas)) {
-        nextMorale[dept] = clamp((nextMorale[dept] ?? 70) + delta, 0, 100);
-      }
+      decide: (caseId, action) =>
+        set((s) => {
+          const caseDef = s.cases.find((c) => c.id === caseId);
+          if (!caseDef) return s;
+          if (s.resolutions.some((r) => r.caseId === caseId)) return s;
 
-      return {
-        resolutions: [...s.resolutions, resolution],
-        trust: clamp(s.trust + resolution.trustDelta, 0, 100),
-        risk: clamp(s.risk + resolution.riskDelta, 0, 100),
-        morale: nextMorale,
-        pinnedClueIds: [],
-        alerts: s.alerts.map((a) =>
-          a.caseId === caseId && a.triaged === 'pending' ? { ...a, triaged: 'dismissed' } : a,
-        ),
-      };
+          const resolution = evaluate(caseDef, s.pinnedClueIds, action);
+
+          const nextMorale = { ...s.morale };
+          for (const [dept, delta] of Object.entries(resolution.moraleDeltas)) {
+            nextMorale[dept] = clamp((nextMorale[dept] ?? 70) + delta, 0, 100);
+          }
+
+          return {
+            resolutions: [...s.resolutions, resolution],
+            trust: clamp(s.trust + resolution.trustDelta, 0, 100),
+            risk: clamp(s.risk + resolution.riskDelta, 0, 100),
+            morale: nextMorale,
+            pinnedClueIds: [],
+            alerts: s.alerts.map((a) =>
+              a.caseId === caseId && a.triaged === 'pending'
+                ? { ...a, triaged: 'dismissed' }
+                : a,
+            ),
+          };
+        }),
+
+      reset: () => set(buildInitialState()),
     }),
-}));
+    {
+      name: 'shadow-it/v1',
+      storage: createJSONStorage(() => idbStorage),
+      version: 1,
+    },
+  ),
+);
 
 export const selectActiveCase = (s: State): Case | null =>
   s.cases.find((c) => !s.resolutions.some((r) => r.caseId === c.id)) ?? null;

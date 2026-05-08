@@ -192,6 +192,9 @@ function ResolutionView({
   resolution: Resolution;
   caseDef: Case;
 }) {
+  const reset = useStore((s) => s.reset);
+  const [confirmReset, setConfirmReset] = useState(false);
+
   return (
     <div className="p-4 space-y-4">
       <div
@@ -231,6 +234,40 @@ function ResolutionView({
       <p className="text-[11px] text-slate-600 text-center font-mono uppercase tracking-wider">
         end of day · debrief screen lands next
       </p>
+
+      <div className="border-t border-slate-900 pt-3">
+        {confirmReset ? (
+          <div className="space-y-2">
+            <p className="text-[11px] text-slate-500 text-center font-mono uppercase tracking-wider">
+              wipe save and start over?
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setConfirmReset(false)}
+                className="py-2 text-[11px] uppercase tracking-wider text-slate-400 border border-slate-800 rounded active:bg-slate-800/50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  reset();
+                  setConfirmReset(false);
+                }}
+                className="py-2 text-[11px] uppercase tracking-wider text-red-300 border border-red-700/40 rounded active:bg-red-900/30"
+              >
+                Confirm reset
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setConfirmReset(true)}
+            className="w-full py-2 text-[10px] uppercase tracking-[0.2em] text-slate-600 active:text-slate-300 font-mono"
+          >
+            reset save
+          </button>
+        )}
+      </div>
     </div>
   );
 }
