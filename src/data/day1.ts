@@ -6,6 +6,23 @@ export const cases: Case[] = [
     title: "Marketing's AI side-channel",
     archetype: 'shadow-ai',
     perpetrator: 'Priya Shah · Marketing',
+    perpetratorDept: 'marketing',
+    briefing:
+      'A marketing service account exported the customers table at midday and immediately uploaded 4.2GB to an LLM endpoint outside the corp network. Two days earlier, marketing expensed a personal-tier subscription to that vendor.',
+    requiredClueIds: ['l2', 'l6', 'l7'],
+    correctAction: 'escalate',
+    narratives: {
+      vindicated:
+        'Legal opens a CCPA review. Priya is placed on leave pending investigation. Marketing morale tanks, but the export logs and egress capture make the case airtight. Two other VPs quietly book one-on-ones to check their own teams.',
+      'right-partial':
+        "You escalate without the full chain. Legal can't confirm data actually left the building, so it gets routed as an HR matter — coaching, not breach response. Board acknowledges the instinct, flags the paperwork.",
+      lucky:
+        'You escalate on instinct, before pinning the evidence. Legal finds the trail themselves and you get partial credit. Board notes you "arrived at the right answer through unclear means."',
+      'missed-soft':
+        "Three months later, a competitor's pitch deck quotes Helix's customer pain-points verbatim. Sales loses two enterprise deals. Forensic review traces the leak to that 4.2GB POST you let slide.",
+      overreacted:
+        "You fire Priya before legal review. She sues for wrongful termination and wins on procedure. The board didn't disagree with your read — they disagreed with you skipping due process. Marketing now treats Governance as the threat.",
+    },
   },
 ];
 

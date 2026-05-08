@@ -30,9 +30,34 @@ export interface Alert {
   triaged: 'pending' | 'investigated' | 'dismissed';
 }
 
+export type ActionType = 'ignore' | 'warn' | 'escalate' | 'terminate';
+export type VerdictTier = 'no-evidence' | 'partial' | 'proved';
+export type OutcomeTier =
+  | 'vindicated'
+  | 'right-partial'
+  | 'lucky'
+  | 'missed-soft'
+  | 'overreacted';
+
 export interface Case {
   id: string;
   title: string;
   archetype: Archetype;
   perpetrator: string;
+  perpetratorDept: string;
+  briefing: string;
+  requiredClueIds: string[];
+  correctAction: ActionType;
+  narratives: Record<OutcomeTier, string>;
+}
+
+export interface Resolution {
+  caseId: string;
+  action: ActionType;
+  verdictTier: VerdictTier;
+  outcomeTier: OutcomeTier;
+  trustDelta: number;
+  riskDelta: number;
+  moraleDeltas: Record<string, number>;
+  narrative: string;
 }

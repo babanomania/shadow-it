@@ -24,7 +24,7 @@ Each call shifts board trust, department morale, and the company-wide breach ris
 
 ## Status
 
-Early prototype. Vite + React + Tailwind scaffold is up. First vertical slice in: triage inbox, logs surface with severity filter and pin-to-case, case board showing pinned clues, attention budget. Decision UI, persistence, and the other surfaces are next.
+Early prototype. Vite + React + Tailwind scaffold is up. The core loop runs end-to-end on one seeded case: triage alerts, pin clues from logs, decide (ignore / warn / escalate / terminate), receive a verdict tier and narrative aftermath. Trust, risk, and per-department morale meters move on every decision. Persistence and additional cases are next.
 
 Full design in [`SPEC.md`](SPEC.md). Operating notes for Claude Code in [`CLAUDE.md`](CLAUDE.md).
 
@@ -55,7 +55,7 @@ Hand-authoring detective cases is expensive. Procedural generation at *runtime* 
 - [x] Triage inbox
 - [x] Logs surface (filter + pin-to-case)
 - [x] Case board (pinned clues view)
-- [ ] Decision UI (ignore / warn / escalate / terminate) with consequences
+- [x] Decision UI + verdict logic (trust / risk / morale meters, 5 outcome tiers)
 - [ ] IndexedDB persistence
 - [ ] End-of-day debrief
 - [ ] First 5 hand-authored cases (currently 1 seeded)
