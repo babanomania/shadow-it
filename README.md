@@ -59,11 +59,12 @@ Hand-authoring detective cases is expensive. Procedural generation at *runtime* 
 - [x] IndexedDB persistence (rehydrate on load, reset action behind confirm)
 - [x] Five hand-authored cases (one per day, archetypes: shadow-ai, shadow-cloud, leak-accidental, exposed-api, insider-exfil)
 - [x] Day-end flow + game-over (trust 0 / risk 100) + win (survive 5 days)
-- [ ] End-of-day debrief
-- [ ] First 5 hand-authored cases (currently 1 seeded)
 - [ ] Gemma case-authoring pipeline
-- [ ] Emails surface
+- [ ] Emails surface (second investigation lens for cross-referencing)
+- [ ] Expenses + Traffic surfaces (currently noise-only — referenced by alerts, no dedicated UI)
+- [ ] Persistence schema — partialize so content updates flow to returning players
 - [ ] PWA polish + deploy
+- [ ] Swipe gestures for triage (mobile polish — buttons-only for now)
 
 ## License
 
