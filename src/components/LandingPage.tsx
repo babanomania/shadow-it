@@ -131,9 +131,9 @@ export function LandingPage({ onStart }: { onStart: () => void }) {
 
         {/* Hero title */}
         <h1 className="text-5xl font-bold tracking-tight leading-none mb-2 bg-gradient-to-b from-slate-50 to-slate-400 bg-clip-text text-transparent">
-          shadow
+          Shadow
           <span className="text-amber-400 bg-clip-text">_</span>
-          <span className="bg-gradient-to-b from-slate-50 to-slate-400 bg-clip-text text-transparent">it</span>
+          <span className="bg-gradient-to-b from-slate-50 to-slate-400 bg-clip-text text-transparent">IT</span>
         </h1>
 
         <p className="text-[12px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-5">
