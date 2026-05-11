@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useStore } from '../store';
 import type { LogEntry, Severity } from '../types';
 
@@ -75,11 +76,24 @@ export function TrafficSurface() {
   const pinnedClueIds = useStore((s) => s.pinnedClueIds);
   const togglePin = useStore((s) => s.togglePin);
 
-  const flows = logs.filter((l) => l.service === 'traffic').map(parseFlow);
+  const [query, setQuery] = useState('');
+  const [direction, setDirection] = useState<'all' | 'egress' | 'ingress'>('all');
 
-  const maxBytes = flows.reduce((m, f) => Math.max(m, f.bytesNum), 1);
+  const allFlows = logs.filter((l) => l.service === 'traffic').map(parseFlow);
+  const maxBytes = allFlows.reduce((m, f) => Math.max(m, f.bytesNum), 1);
 
-  if (flows.length === 0) {
+  const lowerQuery = query.trim().toLowerCase();
+  const flows = allFlows.filter((f) => {
+    if (direction === 'egress' && f.direction !== 'egress') return false;
+    if (direction === 'ingress' && f.direction !== 'ingress') return false;
+    if (lowerQuery) {
+      const haystack = `${f.dest} ${f.log.user} ${f.log.detail}`.toLowerCase();
+      if (!haystack.includes(lowerQuery)) return false;
+    }
+    return true;
+  });
+
+  if (allFlows.length === 0) {
     return (
       <div className="p-6 text-center">
         <div className="text-[10px] uppercase tracking-[0.2em] text-slate-600 mb-2 font-mono">
@@ -90,9 +104,9 @@ export function TrafficSurface() {
     );
   }
 
-  const critCount = flows.filter((f) => f.log.severity === 'critical').length;
-  const warnCount = flows.filter((f) => f.log.severity === 'warn').length;
-  const totalBytes = flows.reduce((s, f) => s + f.bytesNum, 0);
+  const critCount = allFlows.filter((f) => f.log.severity === 'critical').length;
+  const warnCount = allFlows.filter((f) => f.log.severity === 'warn').length;
+  const totalBytes = allFlows.reduce((s, f) => s + f.bytesNum, 0);
   const totalLabel =
     totalBytes >= BYTES_SCALE_GB
       ? `${(totalBytes / BYTES_SCALE_GB).toFixed(1)} GB`
@@ -125,8 +139,8 @@ export function TrafficSurface() {
 
         {/* Stacked severity bar — each segment proportional to its bytes */}
         <div className="mt-3 h-1.5 rounded-full bg-slate-800 flex overflow-hidden gap-px">
-          {flows.map((f) => {
-            const pct = totalBytes > 0 ? Math.max(2, (f.bytesNum / totalBytes) * 100) : 100 / flows.length;
+          {allFlows.map((f) => {
+            const pct = totalBytes > 0 ? Math.max(2, (f.bytesNum / totalBytes) * 100) : 100 / allFlows.length;
             return (
               <div
                 key={f.log.id}
@@ -138,8 +152,34 @@ export function TrafficSurface() {
         </div>
       </div>
 
+      {/* Filter + search */}
+      <div className="flex items-center gap-2">
+        <div className="flex gap-1">
+          {(['all', 'egress', 'ingress'] as const).map((d) => (
+            <button
+              key={d}
+              onClick={() => setDirection(d)}
+              className={`px-2 py-1 text-[10px] uppercase tracking-wider rounded font-mono border transition-colors ${
+                direction === d
+                  ? 'bg-slate-800 text-slate-100 border-slate-700'
+                  : 'bg-transparent text-slate-500 border-slate-800 active:text-slate-200'
+              }`}
+            >
+              {d}
+            </button>
+          ))}
+        </div>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="search dest, user…"
+          className="flex-1 bg-slate-900/60 border border-slate-800 rounded px-2 py-1 text-[11px] font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-700/40"
+        />
+      </div>
+
       <div className="text-[10px] uppercase tracking-[0.2em] text-slate-600 px-1 font-mono">
-        flow detail
+        flow detail · {flows.length} of {allFlows.length}
       </div>
 
       {/* Flow cards */}

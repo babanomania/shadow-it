@@ -3,9 +3,9 @@ import { useStore } from '../store';
 
 const TARGET_EVIDENCE = 3;
 
-const tabs: { id: Tab; label: string }[] = [
-  { id: 'cases', label: 'Cases' },
-  { id: 'surfaces', label: 'Surfaces' },
+const tabs: { id: Tab; label: string; hint: string }[] = [
+  { id: 'desk',    label: 'Desk',    hint: 'inbox · case · decide' },
+  { id: 'records', label: 'Records', hint: 'logs · email · $ · traffic' },
 ];
 
 export function BottomNav({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {
@@ -15,10 +15,10 @@ export function BottomNav({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => v
   const pinnedCount = useStore((s) => s.pinnedClueIds.length);
 
   const badge = (id: Tab): { count: number; tone: 'pending' | 'good' | 'progress' } | null => {
-    if (id === 'cases' && pendingCount > 0) {
+    if (id === 'desk' && pendingCount > 0) {
       return { count: pendingCount, tone: 'pending' };
     }
-    if (id === 'surfaces' && pinnedCount > 0) {
+    if (id === 'records' && pinnedCount > 0) {
       return {
         count: pinnedCount,
         tone: pinnedCount >= TARGET_EVIDENCE ? 'good' : 'progress',
@@ -36,28 +36,38 @@ export function BottomNav({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => v
           <button
             key={t.id}
             onClick={() => onChange(t.id)}
-            className={`relative py-3 text-[10px] uppercase tracking-[0.2em] font-mono transition-colors ${
+            className={`relative py-2.5 flex flex-col items-center gap-0.5 transition-colors ${
               active ? 'text-amber-400' : 'text-slate-500 active:text-slate-200'
             }`}
           >
-            {t.label}
-            {b !== null && (
-              <span
-                className={`absolute top-2 ml-1 inline-block min-w-[14px] px-[3px] text-[9px] leading-[14px] rounded ${
-                  active
-                    ? b.tone === 'good'
-                      ? 'bg-emerald-500 text-slate-950'
-                      : 'bg-amber-500 text-slate-950'
-                    : b.tone === 'good'
-                      ? 'bg-emerald-700/70 text-emerald-100'
-                      : b.tone === 'pending'
-                        ? 'bg-red-800/70 text-red-100'
-                        : 'bg-slate-800 text-slate-300'
-                }`}
-              >
-                {b.count}
-              </span>
+            {active && (
+              <span className="absolute top-0 inset-x-8 h-[2px] bg-amber-400 rounded-b-sm" />
             )}
+            <div className="flex items-center gap-1.5">
+              <span className="text-[12px] uppercase tracking-[0.2em] font-mono font-medium">
+                {t.label}
+              </span>
+              {b !== null && (
+                <span
+                  className={`inline-flex items-center justify-center min-w-[16px] h-[16px] px-1 text-[9px] font-mono rounded-full ${
+                    active
+                      ? b.tone === 'good'
+                        ? 'bg-emerald-500 text-slate-950'
+                        : 'bg-amber-500 text-slate-950'
+                      : b.tone === 'good'
+                        ? 'bg-emerald-700/70 text-emerald-100'
+                        : b.tone === 'pending'
+                          ? 'bg-red-800/80 text-red-100'
+                          : 'bg-slate-800 text-slate-300'
+                  }`}
+                >
+                  {b.count}
+                </span>
+              )}
+            </div>
+            <span className={`text-[9px] font-mono tracking-wider ${active ? 'text-amber-400/70' : 'text-slate-700'}`}>
+              {t.hint}
+            </span>
           </button>
         );
       })}
