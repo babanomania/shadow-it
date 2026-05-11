@@ -2,7 +2,7 @@
   <img src="assets/hero.svg" alt="shadow-it" width="100%"/>
 </p>
 
-# shadow-it
+# Shadow IT
 
 > A mobile-browser detective/strategy game where you play head of governance & security at a fast-growing tech company. Departments break the rules behind your back. You catch them — or you don't.
 

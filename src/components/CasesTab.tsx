@@ -512,7 +512,33 @@ function PinIcon({ className = 'w-4 h-4', filled }: { className?: string; filled
   );
 }
 
-function PendingAlertsSection({ onInvestigate }: { onInvestigate: (surface: Surface) => void }) {
+function CloseIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" className={className} fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+const SEVERITY_DOT: Record<Severity, string> = {
+  critical: 'bg-red-500',
+  warn:     'bg-amber-500',
+  info:     'bg-slate-600',
+};
+
+const SEVERITY_STRIPE: Record<Severity, string> = {
+  critical: 'bg-red-500',
+  warn:     'bg-amber-500',
+  info:     'bg-slate-700',
+};
+
+const SEVERITY_TEXT: Record<Severity, string> = {
+  critical: 'text-red-400',
+  warn:     'text-amber-400',
+  info:     'text-slate-500',
+};
+
+function PendingAlertsSection({ onInvestigate: _ }: { onInvestigate: (surface: Surface) => void }) {
   const alerts = useStore((s) => s.alerts);
   const triage = useStore((s) => s.triage);
   const togglePin = useStore((s) => s.togglePin);
@@ -526,11 +552,6 @@ function PendingAlertsSection({ onInvestigate }: { onInvestigate: (surface: Surf
 
   const sortOrder: Record<Severity, number> = { critical: 0, warn: 1, info: 2 };
   const sorted = [...pending].sort((a, b) => sortOrder[a.severity] - sortOrder[b.severity]);
-
-  const handleInvestigate = (a: Alert) => {
-    triage(a.id, 'investigate');
-    onInvestigate(a.surface);
-  };
 
   const handlePinFromAlert = (a: Alert) => {
     if (!a.clueId) return;
@@ -549,7 +570,7 @@ function PendingAlertsSection({ onInvestigate }: { onInvestigate: (surface: Surf
           incoming · {pending.length}
         </div>
         <span className="text-[10px] font-mono text-slate-700">
-          dismiss · pin · investigate
+          dismiss noise · pin evidence
         </span>
       </div>
 
@@ -576,7 +597,6 @@ function PendingAlertsSection({ onInvestigate }: { onInvestigate: (surface: Surf
               broke={broke}
               pinned={pinned}
               onDismiss={() => triage(a.id, 'dismiss')}
-              onInvestigate={() => handleInvestigate(a)}
               onPin={() => handlePinFromAlert(a)}
             />
           );
@@ -588,7 +608,6 @@ function PendingAlertsSection({ onInvestigate }: { onInvestigate: (surface: Surf
             broke={broke}
             pinned={pinned}
             onDismiss={() => triage(a.id, 'dismiss')}
-            onInvestigate={() => handleInvestigate(a)}
             onPin={() => handlePinFromAlert(a)}
           />
         );
@@ -602,14 +621,12 @@ function CriticalAlertCard({
   broke,
   pinned,
   onDismiss,
-  onInvestigate,
   onPin,
 }: {
   alert: Alert;
   broke: boolean;
   pinned: boolean;
   onDismiss: () => void;
-  onInvestigate: () => void;
   onPin: () => void;
 }) {
   const userMatch = alert.preview.match(/([\w.-]+@[\w.-]+)|([\w-]+-bot)/);
@@ -657,7 +674,7 @@ function CriticalAlertCard({
           </div>
         </div>
 
-        <div className={`grid gap-2 mt-3 ${canPin ? 'grid-cols-3' : 'grid-cols-2'}`}>
+        <div className={`grid gap-2 mt-3 ${canPin ? 'grid-cols-2' : 'grid-cols-1'}`}>
           <button
             onClick={onDismiss}
             className="py-2.5 text-[11px] uppercase tracking-wider text-slate-500 border border-slate-800 rounded font-mono active:bg-slate-800/50"
@@ -668,23 +685,16 @@ function CriticalAlertCard({
             <button
               onClick={onPin}
               disabled={broke}
-              className={`py-2.5 text-[11px] uppercase tracking-wider rounded font-mono flex items-center justify-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed ${
+              className={`py-2.5 text-[11px] uppercase tracking-wider rounded font-mono font-medium flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed ${
                 pinned
                   ? 'text-amber-300 border border-amber-600/40 bg-amber-950/30'
-                  : 'text-amber-300 border border-amber-700/50 bg-amber-950/20 active:bg-amber-900/40'
+                  : 'text-red-200 border border-red-600/50 bg-red-900/30 active:bg-red-900/50 shadow-[0_0_8px_rgba(239,68,68,0.2)]'
               }`}
             >
-              <PinIcon className="w-3 h-3" filled={pinned} />
-              {pinned ? 'pinned' : 'pin'}
+              <PinIcon className="w-3.5 h-3.5" filled={pinned} />
+              {pinned ? 'pinned to case' : 'pin to case · −1'}
             </button>
           )}
-          <button
-            onClick={onInvestigate}
-            disabled={broke}
-            className="py-2.5 text-[11px] uppercase tracking-wider text-red-200 border border-red-600/50 bg-red-900/30 rounded font-mono font-medium active:bg-red-900/50 disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_8px_rgba(239,68,68,0.2)]"
-          >
-            Dig · −1
-          </button>
         </div>
         {broke && (
           <p className="mt-2 text-[10px] text-red-400/80 font-mono uppercase tracking-wider">
@@ -701,14 +711,12 @@ function StandardAlertCard({
   broke,
   pinned,
   onDismiss,
-  onInvestigate,
   onPin,
 }: {
   alert: Alert;
   broke: boolean;
   pinned: boolean;
   onDismiss: () => void;
-  onInvestigate: () => void;
   onPin: () => void;
 }) {
   const isWarn = alert.severity === 'warn';
@@ -753,7 +761,7 @@ function StandardAlertCard({
         </div>
       </div>
 
-      <div className={`grid gap-2 mt-3 ${canPin ? 'grid-cols-3' : 'grid-cols-2'}`}>
+      <div className={`grid gap-2 mt-3 ${canPin ? 'grid-cols-2' : 'grid-cols-1'}`}>
         <button
           onClick={onDismiss}
           className="py-2 text-[11px] uppercase tracking-wider text-slate-400 border border-slate-800 rounded font-mono active:bg-slate-800/50"
@@ -764,23 +772,16 @@ function StandardAlertCard({
           <button
             onClick={onPin}
             disabled={broke}
-            className={`py-2 text-[11px] uppercase tracking-wider rounded font-mono flex items-center justify-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed ${
+            className={`py-2 text-[11px] uppercase tracking-wider rounded font-mono flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed ${
               pinned
                 ? 'text-amber-300 border border-amber-600/40 bg-amber-950/30'
                 : 'text-amber-300 border border-amber-700/40 bg-amber-950/15 active:bg-amber-900/30'
             }`}
           >
-            <PinIcon className="w-3 h-3" filled={pinned} />
-            {pinned ? 'pinned' : 'pin'}
+            <PinIcon className="w-3.5 h-3.5" filled={pinned} />
+            {pinned ? 'pinned to case' : 'pin to case · −1'}
           </button>
         )}
-        <button
-          onClick={onInvestigate}
-          disabled={broke}
-          className="py-2 text-[11px] uppercase tracking-wider text-amber-300 border border-amber-700/40 rounded font-mono active:bg-amber-900/30 disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          Dig · −1
-        </button>
       </div>
       {broke && (
         <p className="mt-2 text-[10px] text-red-400/80 font-mono uppercase tracking-wider">
