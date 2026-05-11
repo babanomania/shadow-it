@@ -11,6 +11,7 @@ export const day3: Day = {
       severity: 'info',
       preview: 'CFO circulating draft slides',
       caseId: null,
+      clueId: 'd3-e5',
       triaged: 'pending',
     },
     {
@@ -20,6 +21,7 @@ export const day3: Day = {
       severity: 'critical',
       preview: 'live API key found in public gist',
       caseId: 'case-003',
+      clueId: 'd3-l9',
       triaged: 'pending',
     },
     {
@@ -29,6 +31,7 @@ export const day3: Day = {
       severity: 'warn',
       preview: 'helix-prod-key-7 hit from 198.51.100.0/24',
       caseId: null,
+      clueId: 'd3-l4',
       triaged: 'pending',
     },
     {
@@ -38,6 +41,7 @@ export const day3: Day = {
       severity: 'info',
       preview: '$29 Linear, expensed by design lead',
       caseId: null,
+      clueId: 'd3-l3',
       triaged: 'pending',
     },
     {
@@ -47,6 +51,7 @@ export const day3: Day = {
       severity: 'info',
       preview: 'priya@helix.corp at 06:12 — earlier than usual',
       caseId: null,
+      clueId: 'd3-l1',
       triaged: 'pending',
     },
     {
@@ -56,6 +61,7 @@ export const day3: Day = {
       severity: 'warn',
       preview: '5xx rate up 40% on /api/checkout (post-mortem in progress)',
       caseId: null,
+      clueId: 'd3-l6',
       triaged: 'pending',
     },
     {
@@ -65,6 +71,7 @@ export const day3: Day = {
       severity: 'warn',
       preview: 'carlos@helix.corp → vendor-debug.example with gist link + key',
       caseId: 'case-003',
+      clueId: 'd3-e2',
       triaged: 'pending',
     },
   ],

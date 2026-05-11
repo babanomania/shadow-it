@@ -11,6 +11,7 @@ export const day1: Day = {
       severity: 'info',
       preview: 'alice@helix.corp from 192.0.2.10',
       caseId: null,
+      clueId: 'd1-l1',
       triaged: 'pending',
     },
     {
@@ -20,6 +21,7 @@ export const day1: Day = {
       severity: 'info',
       preview: '$52.99 — Adobe Creative Cloud, recurring',
       caseId: null,
+      clueId: 'd1-l3',
       triaged: 'pending',
     },
     {
@@ -38,6 +40,7 @@ export const day1: Day = {
       severity: 'warn',
       preview: 'bob@helix.corp x3 fails, success on 4th',
       caseId: null,
+      clueId: 'd1-l4',
       triaged: 'pending',
     },
     {
@@ -47,6 +50,7 @@ export const day1: Day = {
       severity: 'warn',
       preview: '12,481 rows pulled by marketing-bot',
       caseId: 'case-001',
+      clueId: 'd1-l6',
       triaged: 'pending',
     },
     {
@@ -56,6 +60,7 @@ export const day1: Day = {
       severity: 'critical',
       preview: '4.2GB POST to api.unknown-llm.io',
       caseId: 'case-001',
+      clueId: 'd1-l7',
       triaged: 'pending',
     },
     {
@@ -65,6 +70,7 @@ export const day1: Day = {
       severity: 'warn',
       preview: 'priya@helix.corp → personalmail.com — re: customer data',
       caseId: 'case-001',
+      clueId: 'd1-e2',
       triaged: 'pending',
     },
   ],

@@ -40,6 +40,9 @@ export interface Alert {
   severity: Severity;
   preview: string;
   caseId: string | null;
+  /** Optional pointer to the underlying log/email this alert summarises.
+   *  When present, the player can pin the alert directly from the inbox. */
+  clueId?: string;
   triaged: 'pending' | 'investigated' | 'dismissed';
 }
 

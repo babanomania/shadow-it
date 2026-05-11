@@ -11,6 +11,7 @@ export const day5: Day = {
       severity: 'critical',
       preview: '2.1GB pulled by tomas@helix.corp last night',
       caseId: 'case-005',
+      clueId: 'd5-l6',
       triaged: 'pending',
     },
     {
@@ -20,6 +21,7 @@ export const day5: Day = {
       severity: 'critical',
       preview: 'upload to personal storage account',
       caseId: null,
+      clueId: 'd5-l8',
       triaged: 'pending',
     },
     {
@@ -29,6 +31,7 @@ export const day5: Day = {
       severity: 'info',
       preview: 'biweekly run completed',
       caseId: null,
+      clueId: 'd5-l1',
       triaged: 'pending',
     },
     {
@@ -38,6 +41,7 @@ export const day5: Day = {
       severity: 'info',
       preview: 'eng team — replacement cycle',
       caseId: null,
+      clueId: 'd5-e6',
       triaged: 'pending',
     },
     {
@@ -47,6 +51,7 @@ export const day5: Day = {
       severity: 'info',
       preview: 'monthly customer update, 412k recipients',
       caseId: null,
+      clueId: 'd5-e2',
       triaged: 'pending',
     },
     {
@@ -56,6 +61,7 @@ export const day5: Day = {
       severity: 'warn',
       preview: 'tomas@helix.corp filed notice — last day in 8 days',
       caseId: 'case-005',
+      clueId: 'd5-l2',
       triaged: 'pending',
     },
     {
@@ -65,6 +71,7 @@ export const day5: Day = {
       severity: 'critical',
       preview: 'tomas@helix.corp → tomas.aguilar.archive@personalmail.com at 23:18',
       caseId: 'case-005',
+      clueId: 'd5-e3',
       triaged: 'pending',
     },
   ],

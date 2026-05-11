@@ -497,9 +497,26 @@ function InlineDecisionPanel({
 
 // ─── PENDING ALERTS SECTION ─────────────────────────────────────────────────
 
+function PinIcon({ className = 'w-4 h-4', filled }: { className?: string; filled?: boolean }) {
+  if (filled) {
+    return (
+      <svg viewBox="0 0 16 16" className={className} fill="currentColor">
+        <path d="M8 1.5a.5.5 0 01.5.5v.5h2a.5.5 0 01.354.854L9.207 5h.293a2 2 0 012 2v1a.5.5 0 01-.5.5h-2.5v4.5a1 1 0 11-2 0V8.5H4a.5.5 0 01-.5-.5V7a2 2 0 012-2h.293L4.146 3.354A.5.5 0 014.5 2.5h2V2a.5.5 0 01.5-.5h1z" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 16 16" className={className} fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M8 2v.5h2.5L9 4.5h.5a1.5 1.5 0 011.5 1.5V8H5V6a1.5 1.5 0 011.5-1.5H7L5.5 2.5H8V2zM8 8.5V13" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function PendingAlertsSection({ onInvestigate }: { onInvestigate: (surface: Surface) => void }) {
   const alerts = useStore((s) => s.alerts);
   const triage = useStore((s) => s.triage);
+  const togglePin = useStore((s) => s.togglePin);
+  const pinnedClueIds = useStore((s) => s.pinnedClueIds);
   const attention = useStore((s) => s.attention);
 
   const pending = alerts.filter((a) => a.triaged === 'pending');
@@ -515,6 +532,15 @@ function PendingAlertsSection({ onInvestigate }: { onInvestigate: (surface: Surf
     onInvestigate(a.surface);
   };
 
+  const handlePinFromAlert = (a: Alert) => {
+    if (!a.clueId) return;
+    if (!pinnedClueIds.includes(a.clueId)) {
+      togglePin(a.clueId);
+    }
+    // file the alert (counts as investigated) so it leaves the inbox
+    triage(a.id, 'investigate');
+  };
+
   return (
     <section className="space-y-2.5">
       <div className="flex items-center justify-between px-1 mt-1">
@@ -523,7 +549,7 @@ function PendingAlertsSection({ onInvestigate }: { onInvestigate: (surface: Surf
           incoming · {pending.length}
         </div>
         <span className="text-[10px] font-mono text-slate-700">
-          dismiss noise · investigate (−1 attn)
+          dismiss · pin · investigate
         </span>
       </div>
 
@@ -541,14 +567,17 @@ function PendingAlertsSection({ onInvestigate }: { onInvestigate: (surface: Surf
 
       {sorted.map((a) => {
         const broke = attention <= 0;
+        const pinned = !!(a.clueId && pinnedClueIds.includes(a.clueId));
         if (a.severity === 'critical') {
           return (
             <CriticalAlertCard
               key={a.id}
               alert={a}
               broke={broke}
+              pinned={pinned}
               onDismiss={() => triage(a.id, 'dismiss')}
               onInvestigate={() => handleInvestigate(a)}
+              onPin={() => handlePinFromAlert(a)}
             />
           );
         }
@@ -557,8 +586,10 @@ function PendingAlertsSection({ onInvestigate }: { onInvestigate: (surface: Surf
             key={a.id}
             alert={a}
             broke={broke}
+            pinned={pinned}
             onDismiss={() => triage(a.id, 'dismiss')}
             onInvestigate={() => handleInvestigate(a)}
+            onPin={() => handlePinFromAlert(a)}
           />
         );
       })}
@@ -569,16 +600,21 @@ function PendingAlertsSection({ onInvestigate }: { onInvestigate: (surface: Surf
 function CriticalAlertCard({
   alert,
   broke,
+  pinned,
   onDismiss,
   onInvestigate,
+  onPin,
 }: {
   alert: Alert;
   broke: boolean;
+  pinned: boolean;
   onDismiss: () => void;
   onInvestigate: () => void;
+  onPin: () => void;
 }) {
   const userMatch = alert.preview.match(/([\w.-]+@[\w.-]+)|([\w-]+-bot)/);
   const subject = userMatch?.[0] ?? alert.title;
+  const canPin = !!alert.clueId;
 
   return (
     <article className="relative overflow-hidden rounded-xl border-2 border-red-700/60 bg-gradient-to-b from-red-950/30 to-slate-950 shadow-[0_0_20px_rgba(239,68,68,0.15)]">
@@ -605,6 +641,12 @@ function CriticalAlertCard({
                 <SurfaceIcon surface={alert.surface} className="w-3 h-3" />
                 {SURFACE_LABEL[alert.surface]}
               </span>
+              {pinned && (
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wider border font-mono border-amber-600/50 bg-amber-950/40 text-amber-300">
+                  <PinIcon className="w-2.5 h-2.5" filled />
+                  pinned
+                </span>
+              )}
             </div>
             <h3 className="text-[15px] text-slate-50 font-semibold leading-snug">
               {alert.title}
@@ -615,19 +657,33 @@ function CriticalAlertCard({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 mt-3">
+        <div className={`grid gap-2 mt-3 ${canPin ? 'grid-cols-3' : 'grid-cols-2'}`}>
           <button
             onClick={onDismiss}
             className="py-2.5 text-[11px] uppercase tracking-wider text-slate-500 border border-slate-800 rounded font-mono active:bg-slate-800/50"
           >
             Dismiss
           </button>
+          {canPin && (
+            <button
+              onClick={onPin}
+              disabled={broke}
+              className={`py-2.5 text-[11px] uppercase tracking-wider rounded font-mono flex items-center justify-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed ${
+                pinned
+                  ? 'text-amber-300 border border-amber-600/40 bg-amber-950/30'
+                  : 'text-amber-300 border border-amber-700/50 bg-amber-950/20 active:bg-amber-900/40'
+              }`}
+            >
+              <PinIcon className="w-3 h-3" filled={pinned} />
+              {pinned ? 'pinned' : 'pin'}
+            </button>
+          )}
           <button
             onClick={onInvestigate}
             disabled={broke}
             className="py-2.5 text-[11px] uppercase tracking-wider text-red-200 border border-red-600/50 bg-red-900/30 rounded font-mono font-medium active:bg-red-900/50 disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_8px_rgba(239,68,68,0.2)]"
           >
-            Investigate · −1
+            Dig · −1
           </button>
         </div>
         {broke && (
@@ -643,13 +699,17 @@ function CriticalAlertCard({
 function StandardAlertCard({
   alert,
   broke,
+  pinned,
   onDismiss,
   onInvestigate,
+  onPin,
 }: {
   alert: Alert;
   broke: boolean;
+  pinned: boolean;
   onDismiss: () => void;
   onInvestigate: () => void;
+  onPin: () => void;
 }) {
   const isWarn = alert.severity === 'warn';
   const borderClass = isWarn
@@ -658,13 +718,14 @@ function StandardAlertCard({
 
   const userMatch = alert.preview.match(/([\w.-]+@[\w.-]+)|([\w-]+-bot)/);
   const subject = userMatch?.[0] ?? alert.title;
+  const canPin = !!alert.clueId;
 
   return (
     <article className={`rounded-lg border bg-slate-900/40 p-3 ${borderClass}`}>
       <div className="flex items-start gap-2.5">
         <Avatar name={subject} />
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5 mb-1">
+          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
             <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wider border font-mono ${SURFACE_BADGE[alert.surface]}`}>
               <SurfaceIcon surface={alert.surface} className="w-3 h-3" />
               {SURFACE_LABEL[alert.surface]}
@@ -676,6 +737,12 @@ function StandardAlertCard({
             }`}>
               {alert.severity}
             </span>
+            {pinned && (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wider border font-mono border-amber-600/50 bg-amber-950/40 text-amber-300">
+                <PinIcon className="w-2.5 h-2.5" filled />
+                pinned
+              </span>
+            )}
           </div>
           <h3 className="text-[13px] text-slate-100 font-medium leading-snug">
             {alert.title}
@@ -686,19 +753,33 @@ function StandardAlertCard({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 mt-3">
+      <div className={`grid gap-2 mt-3 ${canPin ? 'grid-cols-3' : 'grid-cols-2'}`}>
         <button
           onClick={onDismiss}
           className="py-2 text-[11px] uppercase tracking-wider text-slate-400 border border-slate-800 rounded font-mono active:bg-slate-800/50"
         >
           Dismiss
         </button>
+        {canPin && (
+          <button
+            onClick={onPin}
+            disabled={broke}
+            className={`py-2 text-[11px] uppercase tracking-wider rounded font-mono flex items-center justify-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed ${
+              pinned
+                ? 'text-amber-300 border border-amber-600/40 bg-amber-950/30'
+                : 'text-amber-300 border border-amber-700/40 bg-amber-950/15 active:bg-amber-900/30'
+            }`}
+          >
+            <PinIcon className="w-3 h-3" filled={pinned} />
+            {pinned ? 'pinned' : 'pin'}
+          </button>
+        )}
         <button
           onClick={onInvestigate}
           disabled={broke}
           className="py-2 text-[11px] uppercase tracking-wider text-amber-300 border border-amber-700/40 rounded font-mono active:bg-amber-900/30 disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          Investigate · −1
+          Dig · −1
         </button>
       </div>
       {broke && (

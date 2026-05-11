@@ -11,6 +11,7 @@ export const day2: Day = {
       severity: 'info',
       preview: 'erin@helix.corp from new MacBook',
       caseId: null,
+      clueId: 'd2-l1',
       triaged: 'pending',
     },
     {
@@ -20,6 +21,7 @@ export const day2: Day = {
       severity: 'info',
       preview: '+8 seats added this month — looks routine',
       caseId: null,
+      clueId: 'd2-l2',
       triaged: 'pending',
     },
     {
@@ -29,6 +31,7 @@ export const day2: Day = {
       severity: 'warn',
       preview: '$45 charge to "AWS" by marco — wrong tax jurisdiction',
       caseId: 'case-002',
+      clueId: 'd2-l3',
       triaged: 'pending',
     },
     {
@@ -38,6 +41,7 @@ export const day2: Day = {
       severity: 'warn',
       preview: 'staging deploy x3 fails — looks like CI flake',
       caseId: null,
+      clueId: 'd2-l4',
       triaged: 'pending',
     },
     {
@@ -47,6 +51,7 @@ export const day2: Day = {
       severity: 'warn',
       preview: 'role-cross-account created with non-Helix trust',
       caseId: 'case-002',
+      clueId: 'd2-l5',
       triaged: 'pending',
     },
     {
@@ -56,6 +61,7 @@ export const day2: Day = {
       severity: 'info',
       preview: 'on-call rotation reshuffled by sre',
       caseId: null,
+      clueId: 'd2-l7',
       triaged: 'pending',
     },
     {
@@ -65,6 +71,7 @@ export const day2: Day = {
       severity: 'info',
       preview: 'is there a corp-blessed sandbox? — eng-leads thread',
       caseId: 'case-002',
+      clueId: 'd2-e2',
       triaged: 'pending',
     },
   ],

@@ -11,6 +11,7 @@ export const day4: Day = {
       severity: 'info',
       preview: 'diane@helix.corp morning login',
       caseId: null,
+      clueId: 'd4-l1',
       triaged: 'pending',
     },
     {
@@ -20,6 +21,7 @@ export const day4: Day = {
       severity: 'info',
       preview: 'monthly settlement, nothing unusual',
       caseId: null,
+      clueId: 'd4-l2',
       triaged: 'pending',
     },
     {
@@ -29,6 +31,7 @@ export const day4: Day = {
       severity: 'warn',
       preview: 'partner-token-44 minted with no TTL six weeks ago',
       caseId: 'case-004',
+      clueId: 'd4-l3',
       triaged: 'pending',
     },
     {
@@ -38,6 +41,7 @@ export const day4: Day = {
       severity: 'warn',
       preview: '203.0.113.4 — daily reads of /v1/customers for 42 days',
       caseId: null,
+      clueId: 'd4-l6',
       triaged: 'pending',
     },
     {
@@ -56,6 +60,7 @@ export const day4: Day = {
       severity: 'info',
       preview: 'pagerduty rotation healthy',
       caseId: null,
+      clueId: 'd4-l4',
       triaged: 'pending',
     },
     {
@@ -65,6 +70,7 @@ export const day4: Day = {
       severity: 'warn',
       preview: 'diane@helix.corp explicitly issues no-expiry token',
       caseId: 'case-004',
+      clueId: 'd4-e2',
       triaged: 'pending',
     },
   ],
