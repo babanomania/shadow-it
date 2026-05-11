@@ -5,29 +5,70 @@ import { BottomNav } from './components/BottomNav';
 import { TriageInbox } from './components/TriageInbox';
 import { LogsSurface } from './components/LogsSurface';
 import { EmailsSurface } from './components/EmailsSurface';
+import { ExpensesSurface } from './components/ExpensesSurface';
+import { TrafficSurface } from './components/TrafficSurface';
 import { CaseBoard } from './components/CaseBoard';
 import { GameOverScreen } from './components/GameOverScreen';
 import { WinScreen } from './components/WinScreen';
 import type { Surface } from './types';
 
-export type Tab = 'triage' | 'logs' | 'emails' | 'cases';
+export type Tab = 'triage' | 'surfaces' | 'cases';
 
 const SURFACE_TO_TAB: Record<Surface, Tab> = {
-  logs: 'logs',
-  emails: 'emails',
-  expenses: 'logs',
-  traffic: 'logs',
+  logs: 'surfaces',
+  emails: 'surfaces',
+  expenses: 'surfaces',
+  traffic: 'surfaces',
 };
+
+const SURFACES: { id: Surface; label: string }[] = [
+  { id: 'logs', label: 'Logs' },
+  { id: 'emails', label: 'Email' },
+  { id: 'expenses', label: 'Expenses' },
+  { id: 'traffic', label: 'Traffic' },
+];
+
+function SurfaceChips({
+  active,
+  onChange,
+}: {
+  active: Surface;
+  onChange: (s: Surface) => void;
+}) {
+  return (
+    <div className="flex gap-1 px-3 pt-2 pb-1 border-b border-slate-800/60 bg-[#0b1220]">
+      {SURFACES.map((s) => (
+        <button
+          key={s.id}
+          onClick={() => onChange(s.id)}
+          className={`px-2 py-1 text-[10px] uppercase tracking-wider rounded font-mono border transition-colors ${
+            active === s.id
+              ? 'bg-slate-800 text-slate-100 border-slate-700'
+              : 'bg-transparent text-slate-500 border-slate-800 active:text-slate-200'
+          }`}
+        >
+          {s.label}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export function App() {
   const [hydrated, setHydrated] = useState(useStore.persist.hasHydrated());
   const [tab, setTab] = useState<Tab>('triage');
+  const [surface, setSurface] = useState<Surface>('logs');
   const status = useStore((s) => s.status);
 
   useEffect(() => {
     if (useStore.persist.hasHydrated()) setHydrated(true);
     return useStore.persist.onFinishHydration(() => setHydrated(true));
   }, []);
+
+  const handleInvestigate = (s: Surface) => {
+    setSurface(s);
+    setTab(SURFACE_TO_TAB[s]);
+  };
 
   if (!hydrated) {
     return (
@@ -50,11 +91,16 @@ export function App() {
     <div className="flex h-full max-w-md mx-auto flex-col bg-[#0b1220] border-x border-slate-900">
       <TopBar />
       <main className="flex-1 overflow-y-auto">
-        {tab === 'triage' && (
-          <TriageInbox onInvestigate={(surface) => setTab(SURFACE_TO_TAB[surface])} />
+        {tab === 'triage' && <TriageInbox onInvestigate={handleInvestigate} />}
+        {tab === 'surfaces' && (
+          <>
+            <SurfaceChips active={surface} onChange={setSurface} />
+            {surface === 'logs' && <LogsSurface />}
+            {surface === 'emails' && <EmailsSurface />}
+            {surface === 'expenses' && <ExpensesSurface />}
+            {surface === 'traffic' && <TrafficSurface />}
+          </>
         )}
-        {tab === 'logs' && <LogsSurface />}
-        {tab === 'emails' && <EmailsSurface />}
         {tab === 'cases' && <CaseBoard onContinue={() => setTab('triage')} />}
       </main>
       <BottomNav tab={tab} onChange={setTab} />

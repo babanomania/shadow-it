@@ -3,8 +3,7 @@ import { useStore } from '../store';
 
 const tabs: { id: Tab; label: string }[] = [
   { id: 'triage', label: 'Triage' },
-  { id: 'logs', label: 'Logs' },
-  { id: 'emails', label: 'Emails' },
+  { id: 'surfaces', label: 'Surfaces' },
   { id: 'cases', label: 'Cases' },
 ];
 
@@ -21,7 +20,7 @@ export function BottomNav({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => v
   };
 
   return (
-    <nav className="border-t border-slate-800 grid grid-cols-4 bg-[#0b1220]">
+    <nav className="border-t border-slate-800 grid grid-cols-3 bg-[#0b1220]">
       {tabs.map((t) => {
         const active = t.id === tab;
         const count = badge(t.id);
