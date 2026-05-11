@@ -9,7 +9,7 @@ const TIER_LABEL: Record<string, string> = {
   overreacted: 'overreached',
 };
 
-export function WinScreen() {
+export function WinScreen({ onExit }: { onExit?: () => void }) {
   const trust = useStore((s) => s.trust);
   const risk = useStore((s) => s.risk);
   const morale = useStore((s) => s.morale);
@@ -96,12 +96,22 @@ export function WinScreen() {
               </div>
             </div>
           ) : (
-            <button
-              onClick={() => setConfirmReset(true)}
-              className="w-full py-3 text-[11px] uppercase tracking-[0.2em] text-emerald-300 border border-emerald-700/40 rounded font-mono active:bg-emerald-900/30"
-            >
-              new quarter
-            </button>
+            <div className="space-y-2">
+              <button
+                onClick={() => setConfirmReset(true)}
+                className="w-full py-3 text-[11px] uppercase tracking-[0.2em] text-emerald-300 border border-emerald-700/40 rounded font-mono active:bg-emerald-900/30"
+              >
+                new quarter
+              </button>
+              {onExit && (
+                <button
+                  onClick={onExit}
+                  className="w-full py-2 text-[11px] uppercase tracking-[0.2em] text-slate-500 border border-slate-800 rounded font-mono active:bg-slate-800/50"
+                >
+                  back to landing
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>

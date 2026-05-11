@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useStore } from '../store';
 
-export function GameOverScreen() {
+export function GameOverScreen({ onExit }: { onExit?: () => void }) {
   const trust = useStore((s) => s.trust);
   const risk = useStore((s) => s.risk);
   const day = useStore((s) => s.day);
@@ -80,12 +80,22 @@ export function GameOverScreen() {
               </div>
             </div>
           ) : (
-            <button
-              onClick={() => setConfirmReset(true)}
-              className="w-full py-3 text-[11px] uppercase tracking-[0.2em] text-amber-300 border border-amber-700/40 rounded font-mono active:bg-amber-900/30"
-            >
-              start over
-            </button>
+            <div className="space-y-2">
+              <button
+                onClick={() => setConfirmReset(true)}
+                className="w-full py-3 text-[11px] uppercase tracking-[0.2em] text-amber-300 border border-amber-700/40 rounded font-mono active:bg-amber-900/30"
+              >
+                start over
+              </button>
+              {onExit && (
+                <button
+                  onClick={onExit}
+                  className="w-full py-2 text-[11px] uppercase tracking-[0.2em] text-slate-500 border border-slate-800 rounded font-mono active:bg-slate-800/50"
+                >
+                  back to landing
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>

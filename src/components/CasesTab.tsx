@@ -225,6 +225,7 @@ function ActiveCaseCard({
 }) {
   const logs = useStore((s) => s.logs);
   const emails = useStore((s) => s.emails);
+  const alerts = useStore((s) => s.alerts);
   const pinnedClueIds = useStore((s) => s.pinnedClueIds);
   const togglePin = useStore((s) => s.togglePin);
   const decide = useStore((s) => s.decide);
@@ -232,6 +233,9 @@ function ActiveCaseCard({
   const pinnedLogs = logs.filter((l) => pinnedClueIds.includes(l.id));
   const pinnedEmails = emails.filter((e) => pinnedClueIds.includes(e.id));
   const pinnedCount = pinnedLogs.length + pinnedEmails.length;
+
+  const pendingCount = alerts.filter((a) => a.triaged === 'pending').length;
+  const inboxClear = pendingCount === 0;
 
   const [showDecide, setShowDecide] = useState(false);
 
@@ -268,12 +272,32 @@ function ActiveCaseCard({
       )}
 
       {!showDecide ? (
-        <button
-          onClick={() => setShowDecide(true)}
-          className="w-full py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono text-amber-200 border border-amber-700/50 bg-amber-950/30 rounded-lg active:bg-amber-900/40 shadow-[0_0_10px_rgba(245,158,11,0.1)]"
-        >
-          file decision →
-        </button>
+        inboxClear ? (
+          <button
+            onClick={() => setShowDecide(true)}
+            className="w-full py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono text-amber-200 border border-amber-700/50 bg-amber-950/30 rounded-lg active:bg-amber-900/40 shadow-[0_0_10px_rgba(245,158,11,0.1)]"
+          >
+            file decision →
+          </button>
+        ) : (
+          <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-3 space-y-2">
+            <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-wider">
+              <span className="text-slate-600">▸</span>
+              <span className="text-slate-500">decision locked</span>
+            </div>
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              Clear your inbox before filing. You still have{' '}
+              <span className="text-amber-300">{pendingCount} alert{pendingCount === 1 ? '' : 's'}</span>{' '}
+              waiting — dismiss the noise, investigate what you want to pull receipts on.
+            </p>
+            <button
+              disabled
+              className="w-full py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono text-slate-600 border border-slate-800 bg-slate-900/40 rounded-lg cursor-not-allowed"
+            >
+              file decision · locked
+            </button>
+          </div>
+        )
       ) : (
         <InlineDecisionPanel
           caseDef={caseDef}
@@ -327,7 +351,7 @@ function EvidenceMeter({ pinnedCount }: { pinnedCount: number }) {
 
       <p className="text-[10px] font-mono text-slate-600 leading-relaxed">
         {pinnedCount === 0
-          ? 'Pin clues from Surfaces to build your case.'
+          ? 'Pin clues from Records to build your case.'
           : reachedTarget
             ? 'Solid stack. Decide when you are ready.'
             : `${TARGET_EVIDENCE - pinnedCount} more clue${TARGET_EVIDENCE - pinnedCount === 1 ? '' : 's'} usually clears a case.`}

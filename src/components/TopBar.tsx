@@ -34,7 +34,7 @@ function MeterBar({
   );
 }
 
-export function TopBar() {
+export function TopBar({ onExit }: { onExit?: () => void }) {
   const day = useStore((s) => s.day);
   const attention = useStore((s) => s.attention);
   const attentionMax = useStore((s) => s.attentionMax);
@@ -60,11 +60,25 @@ export function TopBar() {
             day {day}
           </span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10px] uppercase tracking-wider font-mono text-slate-600">attn</span>
-          <span className={`text-[10px] font-mono tabular-nums ${attention <= 1 ? 'text-red-400' : 'text-amber-400'}`}>
-            {attention}/{attentionMax}
-          </span>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] uppercase tracking-wider font-mono text-slate-600">attn</span>
+            <span className={`text-[10px] font-mono tabular-nums ${attention <= 1 ? 'text-red-400' : 'text-amber-400'}`}>
+              {attention}/{attentionMax}
+            </span>
+          </div>
+          {onExit && (
+            <button
+              onClick={onExit}
+              aria-label="Exit to landing"
+              title="Exit to landing"
+              className="text-slate-600 active:text-slate-300 p-0.5 -m-0.5"
+            >
+              <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5" stroke="currentColor" strokeWidth="1.5">
+                <path d="M10 11l-2-3 2-3M8 8h6M5 3H3.5A1.5 1.5 0 002 4.5v7A1.5 1.5 0 003.5 13H5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 

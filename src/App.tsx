@@ -10,6 +10,7 @@ import { ExpensesSurface } from './components/ExpensesSurface';
 import { TrafficSurface } from './components/TrafficSurface';
 import { GameOverScreen } from './components/GameOverScreen';
 import { WinScreen } from './components/WinScreen';
+import { LandingPage } from './components/LandingPage';
 import type { Surface } from './types';
 
 export type Tab = 'desk' | 'records';
@@ -54,8 +55,6 @@ const SURFACE_META: Record<Surface, { label: string; accent: string; activeAccen
 
 const SURFACE_ORDER: Surface[] = ['logs', 'emails', 'expenses', 'traffic'];
 
-// ─── SURFACE TAB BAR ────────────────────────────────────────────────────────
-
 function SurfaceTabBar({
   active,
   onChange,
@@ -74,7 +73,6 @@ function SurfaceTabBar({
     traffic: logs.filter((l) => l.service === 'traffic').length,
   };
 
-  // pinned items per surface (logs/emails track ids; expenses/traffic share log ids)
   const pinnedPer: Record<Surface, number> = {
     logs: logs.filter((l) => pinnedClueIds.includes(l.id) && l.service !== 'expense' && l.service !== 'traffic').length,
     emails: emails.filter((e) => pinnedClueIds.includes(e.id)).length,
@@ -130,8 +128,6 @@ function SurfaceTabBar({
   );
 }
 
-// ─── EVIDENCE COUNTER STRIP ─────────────────────────────────────────────────
-
 function EvidenceCounterStrip() {
   const pinnedCount = useStore((s) => s.pinnedClueIds.length);
   const reached = pinnedCount >= TARGET_EVIDENCE;
@@ -167,6 +163,7 @@ function EvidenceCounterStrip() {
 
 export function App() {
   const [hydrated, setHydrated] = useState(useStore.persist.hasHydrated());
+  const [started, setStarted] = useState(false);
   const [tab, setTab] = useState<Tab>('desk');
   const [surface, setSurface] = useState<Surface>('logs');
   const status = useStore((s) => s.status);
@@ -179,6 +176,12 @@ export function App() {
   const handleInvestigate = (s: Surface) => {
     setSurface(s);
     setTab('records');
+  };
+
+  const handleExit = () => {
+    setStarted(false);
+    setTab('desk');
+    setSurface('logs');
   };
 
   if (!hydrated) {
@@ -195,12 +198,16 @@ export function App() {
     );
   }
 
-  if (status === 'game-over') return <GameOverScreen />;
-  if (status === 'won') return <WinScreen />;
+  if (!started) {
+    return <LandingPage onStart={() => setStarted(true)} />;
+  }
+
+  if (status === 'game-over') return <GameOverScreen onExit={handleExit} />;
+  if (status === 'won') return <WinScreen onExit={handleExit} />;
 
   return (
     <div className="flex h-full max-w-md mx-auto flex-col bg-[#0b1220] border-x border-slate-900">
-      <TopBar />
+      <TopBar onExit={handleExit} />
       <main className="flex-1 overflow-y-auto">
         {tab === 'desk' && <CasesTab onInvestigate={handleInvestigate} />}
         {tab === 'records' && (
