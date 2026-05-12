@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useStore } from '../store';
+import { selectAllPinnedClueIds, useStore } from '../store';
 import type { LogEntry, Severity } from '../types';
 
 const severityColor: Record<Severity, string> = {
@@ -36,7 +36,7 @@ type Filter = 'all' | 'warn' | 'critical';
 
 export function LogsSurface() {
   const logs = useStore((s) => s.logs);
-  const pinnedClueIds = useStore((s) => s.pinnedClueIds);
+  const allPinned = useStore(selectAllPinnedClueIds);
   const togglePin = useStore((s) => s.togglePin);
 
   const [filter, setFilter] = useState<Filter>('all');
@@ -122,7 +122,7 @@ export function LogsSurface() {
             <LogRow
               key={l.id}
               log={l}
-              pinned={pinnedClueIds.includes(l.id)}
+              pinned={allPinned.has(l.id)}
               open={openId === l.id}
               onToggle={() => setOpenId(openId === l.id ? null : l.id)}
               onPin={() => togglePin(l.id)}

@@ -1,5 +1,5 @@
 import type { Tab } from '../App';
-import { useStore } from '../store';
+import { selectAllPinnedClueIds, useStore } from '../store';
 
 const TARGET_EVIDENCE = 3;
 
@@ -12,7 +12,7 @@ export function BottomNav({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => v
   const pendingCount = useStore(
     (s) => s.alerts.filter((a) => a.triaged === 'pending').length,
   );
-  const pinnedCount = useStore((s) => s.pinnedClueIds.length);
+  const pinnedCount = useStore(selectAllPinnedClueIds).size;
 
   const badge = (id: Tab): { count: number; tone: 'pending' | 'good' | 'progress' } | null => {
     if (id === 'desk' && pendingCount > 0) {

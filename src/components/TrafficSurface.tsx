@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useStore } from '../store';
+import { selectAllPinnedClueIds, useStore } from '../store';
 import type { LogEntry, Severity } from '../types';
 
 interface ParsedFlow {
@@ -73,7 +73,7 @@ function BytesBar({ bytesNum, maxBytes, severity }: { bytesNum: number; maxBytes
 
 export function TrafficSurface() {
   const logs = useStore((s) => s.logs);
-  const pinnedClueIds = useStore((s) => s.pinnedClueIds);
+  const allPinned = useStore(selectAllPinnedClueIds);
   const togglePin = useStore((s) => s.togglePin);
 
   const [query, setQuery] = useState('');
@@ -184,7 +184,7 @@ export function TrafficSurface() {
 
       {/* Flow cards */}
       {flows.map(({ log, dest, bytesRaw, bytesNum, proto, direction, note }) => {
-        const pinned = pinnedClueIds.includes(log.id);
+        const pinned = allPinned.has(log.id);
         const flagged = log.severity !== 'info';
         return (
           <article

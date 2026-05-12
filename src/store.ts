@@ -12,7 +12,12 @@ import type {
   Status,
   VerdictTier,
 } from './types';
-import { days } from './data';
+import {
+  applyQuarterEndRegression,
+  days,
+  isLastDayOfQuarter,
+  quarterOf,
+} from './data';
 
 type TriageAction = 'investigate' | 'dismiss';
 type AlertOutcome = 'investigated' | 'dismissed';
@@ -101,6 +106,14 @@ export function evaluate(
   };
 }
 
+interface QuarterSnapshot {
+  quarter: number;
+  preTrust: number;
+  preRisk: number;
+  postTrust: number;
+  postRisk: number;
+}
+
 interface State {
   day: number;
   attention: number;
@@ -112,12 +125,17 @@ interface State {
   logs: LogEntry[];
   emails: EmailThread[];
   cases: Case[];
+  /** Transient pins for the current day's daily case — cleared each day. */
   pinnedClueIds: string[];
+  /** Persistent pins for multi-day arcs, keyed by arcId. Stick around until reset. */
+  arcPins: Record<string, string[]>;
   resolutions: Resolution[];
   status: Status;
+  /** Filled when status === 'quarter-end' so the screen can show pre/post deltas. */
+  quarterSnapshot: QuarterSnapshot | null;
 
   triage: (id: string, action: TriageAction) => void;
-  togglePin: (logId: string) => void;
+  togglePin: (clueId: string) => void;
   decide: (caseId: string, action: ActionType) => void;
   nextDay: () => void;
   reset: () => void;
@@ -153,8 +171,10 @@ const buildInitialState = () => ({
   risk: 20,
   morale: seedMorale(),
   pinnedClueIds: [] as string[],
+  arcPins: {} as Record<string, string[]>,
   resolutions: [] as Resolution[],
   status: 'playing' as Status,
+  quarterSnapshot: null as QuarterSnapshot | null,
 });
 
 const triageActionsFrom = (alerts: Alert[]): Record<string, AlertOutcome> => {
@@ -176,6 +196,18 @@ const applyTriageActions = (
   }));
 };
 
+/** Find the arcId for a given clue (log or email) by checking the current day's data. */
+function findArcIdForClue(
+  clueId: string,
+  logs: LogEntry[],
+  emails: EmailThread[],
+): string | undefined {
+  const log = logs.find((l) => l.id === clueId);
+  if (log?.arcId) return log.arcId;
+  const email = emails.find((e) => e.id === clueId);
+  return email?.arcId;
+}
+
 type PersistedShape = {
   day: number;
   attention: number;
@@ -183,8 +215,10 @@ type PersistedShape = {
   risk: number;
   morale: Record<string, number>;
   pinnedClueIds: string[];
+  arcPins: Record<string, string[]>;
   resolutions: Resolution[];
   status: Status;
+  quarterSnapshot: QuarterSnapshot | null;
   triageActions: Record<string, AlertOutcome>;
 };
 
@@ -216,12 +250,22 @@ export const useStore = create<State>()(
           attention: action === 'investigate' ? Math.max(0, s.attention - 1) : s.attention,
         })),
 
-      togglePin: (logId) =>
-        set((s) => ({
-          pinnedClueIds: s.pinnedClueIds.includes(logId)
-            ? s.pinnedClueIds.filter((id) => id !== logId)
-            : [...s.pinnedClueIds, logId],
-        })),
+      togglePin: (clueId) =>
+        set((s) => {
+          const arcId = findArcIdForClue(clueId, s.logs, s.emails);
+          if (arcId) {
+            const current = s.arcPins[arcId] ?? [];
+            const next = current.includes(clueId)
+              ? current.filter((id) => id !== clueId)
+              : [...current, clueId];
+            return { arcPins: { ...s.arcPins, [arcId]: next } };
+          }
+          return {
+            pinnedClueIds: s.pinnedClueIds.includes(clueId)
+              ? s.pinnedClueIds.filter((id) => id !== clueId)
+              : [...s.pinnedClueIds, clueId],
+          };
+        }),
 
       decide: (caseId, action) =>
         set((s) => {
@@ -229,7 +273,12 @@ export const useStore = create<State>()(
           if (!caseDef) return s;
           if (s.resolutions.some((r) => r.caseId === caseId)) return s;
 
-          const resolution = evaluate(caseDef, s.pinnedClueIds, action, s.day);
+          // Arc cases pull from the persistent arc-pin set; daily cases use today's transient pins.
+          const pinsForCase = caseDef.arcId
+            ? s.arcPins[caseDef.arcId] ?? []
+            : s.pinnedClueIds;
+
+          const resolution = evaluate(caseDef, pinsForCase, action, s.day);
 
           const nextMorale = { ...s.morale };
           for (const [dept, delta] of Object.entries(resolution.moraleDeltas)) {
@@ -249,12 +298,15 @@ export const useStore = create<State>()(
           else if (allResolved) nextStatus = 'day-end';
           else nextStatus = 'playing';
 
+          // Clear transient pins only when a non-arc case lands.
+          const clearTransient = !caseDef.arcId;
+
           return {
             resolutions: newResolutions,
             trust: nextTrust,
             risk: nextRisk,
             morale: nextMorale,
-            pinnedClueIds: [],
+            pinnedClueIds: clearTransient ? [] : s.pinnedClueIds,
             status: nextStatus,
             alerts: s.alerts.map((a) =>
               a.caseId === caseId && a.triaged === 'pending'
@@ -266,10 +318,42 @@ export const useStore = create<State>()(
 
       nextDay: () =>
         set((s) => {
+          // From a quarter-end debrief, advance into the first day of the next quarter.
+          if (s.status === 'quarter-end') {
+            const next = s.day + 1;
+            if (next > days.length) {
+              return { status: 'won' as Status, quarterSnapshot: null };
+            }
+            return {
+              ...buildDayState(next),
+              pinnedClueIds: [],
+              status: 'playing' as Status,
+              quarterSnapshot: null,
+            };
+          }
+
           const next = s.day + 1;
           if (next > days.length) {
             return { status: 'won' as Status };
           }
+
+          // Crossing a quarter boundary — apply regression and pause for the screen.
+          if (isLastDayOfQuarter(s.day)) {
+            const regressed = applyQuarterEndRegression(s.trust, s.risk);
+            return {
+              status: 'quarter-end' as Status,
+              trust: regressed.trust,
+              risk: regressed.risk,
+              quarterSnapshot: {
+                quarter: quarterOf(s.day),
+                preTrust: s.trust,
+                preRisk: s.risk,
+                postTrust: regressed.trust,
+                postRisk: regressed.risk,
+              },
+            };
+          }
+
           return {
             ...buildDayState(next),
             pinnedClueIds: [],
@@ -282,7 +366,7 @@ export const useStore = create<State>()(
     {
       name: 'shadow-it/v1',
       storage: createJSONStorage(() => idbStorage),
-      version: 3,
+      version: 4,
       partialize: (state): PersistedShape => ({
         day: state.day,
         attention: state.attention,
@@ -290,8 +374,10 @@ export const useStore = create<State>()(
         risk: state.risk,
         morale: state.morale,
         pinnedClueIds: state.pinnedClueIds,
+        arcPins: state.arcPins,
         resolutions: state.resolutions,
         status: state.status,
+        quarterSnapshot: state.quarterSnapshot,
         triageActions: triageActionsFrom(state.alerts),
       }),
       merge: (persisted, current) => {
@@ -308,19 +394,24 @@ export const useStore = create<State>()(
           risk: typeof p.risk === 'number' ? p.risk : current.risk,
           morale: p.morale ?? current.morale,
           pinnedClueIds: p.pinnedClueIds ?? current.pinnedClueIds,
+          arcPins: p.arcPins ?? current.arcPins,
           resolutions: p.resolutions ?? current.resolutions,
           status: p.status ?? current.status,
+          quarterSnapshot: p.quarterSnapshot ?? current.quarterSnapshot,
         };
       },
       migrate: (persistedState, version) => {
-        if (version === 2 && persistedState && typeof persistedState === 'object') {
-          const old = persistedState as { alerts?: Alert[] } & Record<string, unknown>;
-          return {
-            ...old,
-            triageActions: triageActionsFrom(old.alerts ?? []),
-          };
+        if (!persistedState || typeof persistedState !== 'object') return persistedState;
+        const old = persistedState as Record<string, unknown>;
+        if (version === 2) {
+          old.triageActions = triageActionsFrom((old.alerts as Alert[]) ?? []);
         }
-        return persistedState;
+        if (version < 4) {
+          // arcPins and quarterSnapshot are new in v4.
+          old.arcPins = old.arcPins ?? {};
+          old.quarterSnapshot = old.quarterSnapshot ?? null;
+        }
+        return old;
       },
     },
   ),
@@ -335,4 +426,13 @@ export const selectLastResolution = (s: State): Resolution | null =>
 export const selectCurrentDayResolution = (s: State): Resolution | null => {
   const forDay = s.resolutions.filter((r) => r.day === s.day);
   return forDay[forDay.length - 1] ?? null;
+};
+
+/** All pinned clue IDs across transient and arc buckets. Useful for UI badges. */
+export const selectAllPinnedClueIds = (s: State): Set<string> => {
+  const all = new Set(s.pinnedClueIds);
+  for (const arr of Object.values(s.arcPins)) {
+    for (const id of arr) all.add(id);
+  }
+  return all;
 };

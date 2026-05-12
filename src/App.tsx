@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { useEffect, useState } from 'react';
-import { useStore } from './store';
+import { useStore, selectAllPinnedClueIds } from './store';
 import { TopBar } from './components/TopBar';
 import { BottomNav } from './components/BottomNav';
 import { CasesTab } from './components/CasesTab';
@@ -11,6 +11,7 @@ import { TrafficSurface } from './components/TrafficSurface';
 import { GameOverScreen } from './components/GameOverScreen';
 import { WinScreen } from './components/WinScreen';
 import { LandingPage } from './components/LandingPage';
+import { QuarterEndScreen } from './components/QuarterEndScreen';
 import type { Surface } from './types';
 
 export type Tab = 'desk' | 'records';
@@ -64,7 +65,7 @@ function SurfaceTabBar({
 }) {
   const logs = useStore((s) => s.logs);
   const emails = useStore((s) => s.emails);
-  const pinnedClueIds = useStore((s) => s.pinnedClueIds);
+  const allPinned = useStore(selectAllPinnedClueIds);
 
   const counts: Record<Surface, number> = {
     logs: logs.length,
@@ -74,10 +75,10 @@ function SurfaceTabBar({
   };
 
   const pinnedPer: Record<Surface, number> = {
-    logs: logs.filter((l) => pinnedClueIds.includes(l.id) && l.service !== 'expense' && l.service !== 'traffic').length,
-    emails: emails.filter((e) => pinnedClueIds.includes(e.id)).length,
-    expenses: logs.filter((l) => l.service === 'expense' && pinnedClueIds.includes(l.id)).length,
-    traffic: logs.filter((l) => l.service === 'traffic' && pinnedClueIds.includes(l.id)).length,
+    logs: logs.filter((l) => allPinned.has(l.id) && l.service !== 'expense' && l.service !== 'traffic').length,
+    emails: emails.filter((e) => allPinned.has(e.id)).length,
+    expenses: logs.filter((l) => l.service === 'expense' && allPinned.has(l.id)).length,
+    traffic: logs.filter((l) => l.service === 'traffic' && allPinned.has(l.id)).length,
   };
 
   return (
@@ -129,7 +130,8 @@ function SurfaceTabBar({
 }
 
 function EvidenceCounterStrip() {
-  const pinnedCount = useStore((s) => s.pinnedClueIds.length);
+  const allPinned = useStore(selectAllPinnedClueIds);
+  const pinnedCount = allPinned.size;
   const reached = pinnedCount >= TARGET_EVIDENCE;
   const slots = Math.max(TARGET_EVIDENCE, pinnedCount);
 
@@ -204,6 +206,7 @@ export function App() {
 
   if (status === 'game-over') return <GameOverScreen onExit={handleExit} />;
   if (status === 'won') return <WinScreen onExit={handleExit} />;
+  if (status === 'quarter-end') return <QuarterEndScreen />;
 
   return (
     <div className="flex h-full max-w-md mx-auto flex-col bg-[#0b1220] border-x border-slate-900">

@@ -163,12 +163,18 @@ function ActiveCaseCard({
   const emails = useStore((s) => s.emails);
   const alerts = useStore((s) => s.alerts);
   const pinnedClueIds = useStore((s) => s.pinnedClueIds);
+  const arcPins = useStore((s) => s.arcPins);
   const togglePin = useStore((s) => s.togglePin);
   const decide = useStore((s) => s.decide);
 
-  const pinnedLogs = logs.filter((l) => pinnedClueIds.includes(l.id));
-  const pinnedEmails = emails.filter((e) => pinnedClueIds.includes(e.id));
-  const pinnedCount = pinnedLogs.length + pinnedEmails.length;
+  // Arc cases pull from their persistent pin set (which may include clues from earlier days
+  // that no longer appear in today's logs). Daily cases use today's transient pins.
+  const activePinIds = caseDef.arcId
+    ? (arcPins[caseDef.arcId] ?? [])
+    : pinnedClueIds;
+  const pinnedLogs = logs.filter((l) => activePinIds.includes(l.id));
+  const pinnedEmails = emails.filter((e) => activePinIds.includes(e.id));
+  const pinnedCount = activePinIds.length;
 
   const pendingCount = alerts.filter((a) => a.triaged === 'pending').length;
   const inboxClear = pendingCount === 0;
@@ -481,6 +487,7 @@ function PendingAlertsSection({ onInvestigate: _ }: { onInvestigate: (surface: S
   const triage = useStore((s) => s.triage);
   const togglePin = useStore((s) => s.togglePin);
   const pinnedClueIds = useStore((s) => s.pinnedClueIds);
+  const arcPins = useStore((s) => s.arcPins);
   const attention = useStore((s) => s.attention);
 
   const pending = alerts.filter((a) => a.triaged === 'pending');
@@ -492,9 +499,15 @@ function PendingAlertsSection({ onInvestigate: _ }: { onInvestigate: (surface: S
   const sortOrder: Record<Severity, number> = { critical: 0, warn: 1, info: 2 };
   const sorted = [...pending].sort((a, b) => sortOrder[a.severity] - sortOrder[b.severity]);
 
+  // Combined check across transient pins (daily case) and arc pins (cross-day).
+  const isPinned = (clueId: string, arcId?: string): boolean => {
+    if (arcId) return (arcPins[arcId] ?? []).includes(clueId);
+    return pinnedClueIds.includes(clueId);
+  };
+
   const handlePinFromAlert = (a: Alert) => {
     if (!a.clueId) return;
-    if (!pinnedClueIds.includes(a.clueId)) {
+    if (!isPinned(a.clueId, a.arcId)) {
       togglePin(a.clueId);
     }
     triage(a.id, 'investigate');
@@ -540,7 +553,7 @@ function PendingAlertsSection({ onInvestigate: _ }: { onInvestigate: (surface: S
       <div className="rounded-lg border border-slate-800 bg-slate-900/30 overflow-hidden divide-y divide-slate-800/70">
         {sorted.map((a) => {
           const broke = attention <= 0;
-          const pinned = !!(a.clueId && pinnedClueIds.includes(a.clueId));
+          const pinned = !!(a.clueId && isPinned(a.clueId, a.arcId));
           return (
             <AlertRow
               key={a.id}
@@ -597,6 +610,17 @@ function AlertRow({
             <span className="text-[9px] font-mono uppercase tracking-wider text-slate-500 truncate">
               {SURFACE_LABEL[alert.surface]}
             </span>
+            {alert.arcId && (
+              <>
+                <span className="text-slate-700 text-[9px]">·</span>
+                <span
+                  className="text-[9px] font-mono uppercase tracking-wider text-violet-400"
+                  title="Part of a multi-day arc — pin clues across days"
+                >
+                  arc
+                </span>
+              </>
+            )}
             {pinned && (
               <>
                 <span className="text-slate-700 text-[9px]">·</span>

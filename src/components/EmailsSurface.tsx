@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useStore } from '../store';
+import { selectAllPinnedClueIds, useStore } from '../store';
 import type { EmailThread, Severity } from '../types';
 
 const severityRing: Record<Severity, string> = {
@@ -14,7 +14,7 @@ function isExternal(addr: string): boolean {
 
 export function EmailsSurface() {
   const emails = useStore((s) => s.emails);
-  const pinnedClueIds = useStore((s) => s.pinnedClueIds);
+  const allPinned = useStore(selectAllPinnedClueIds);
   const togglePin = useStore((s) => s.togglePin);
   const [openId, setOpenId] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'external' | 'flagged'>('all');
@@ -105,7 +105,7 @@ export function EmailsSurface() {
             <EmailCard
               key={e.id}
               email={e}
-              pinned={pinnedClueIds.includes(e.id)}
+              pinned={allPinned.has(e.id)}
               open={openId === e.id}
               onToggle={() => setOpenId(openId === e.id ? null : e.id)}
               onPin={() => togglePin(e.id)}
