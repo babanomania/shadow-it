@@ -12,69 +12,90 @@
   </a>
 </p>
 
-> Best on mobile (portrait). Works in any modern browser — no install, no account.
+> Best on mobile (portrait). Works in any modern browser — no install, no account, no approval required from your IT department (the irony is not lost on us).
 
 **Papers Please × Splunk × office politics, in 3-minute commute sessions.**
 
 ## What is it?
 
-You are the new VP of Governance & Security at *Helix Corp*. Behind your back, departments are spinning up unsanctioned cloud, piping customer data into unauthorized AI tools, exposing internal APIs, and leaking secrets. Your job is to investigate anomalies across **logs, emails, expenses, and network traffic** — cross-reference the four lenses to build cases, then decide: ignore, warn, escalate, or terminate.
+You are the new VP of Governance & Security at *Helix Corp*. Congratulations on the promotion. You have no budget, no staff, and a SIEM that's been throwing 7 unresolved anomalies since Q2. Morale is "fine."
 
-Each call shifts board trust, department morale, and the company-wide breach risk. Survive 100 days — four quarters — without a breach or a mutiny.
+Behind your back: Engineering is running a personal AWS account on the corporate card. Design forwarded the product roadmap to their Notion. Finance accessed the director-band comp table and is now "just asking questions" on LinkedIn. Someone's Slack is billing $200/month for an AI assistant that Legal has never heard of. And a zombie API token from a vendor you offboarded eleven months ago is slowly exfiltrating your customer database at 2 AM.
+
+Your job: cross-reference **logs, emails, expenses, and network traffic** to build cases, then decide — ignore, warn, escalate, or terminate. Every call moves board trust and breach risk. Sometimes in the direction you wanted.
+
+Survive 100 days — four quarters — without a breach, a mutiny, or a strongly-worded letter from the board. We believe in you. The board is less certain (Trust: 60/100).
 
 ## Core loop
 
-1. **Triage** — swipe through alerts; most are noise, a few are real
-2. **Investigate** — pull evidence from the four surfaces; each pull costs attention budget
-3. **Connect dots** — pin clues to a case board, link them to form hypotheses
-4. **Decide** — ignore, warn, escalate, terminate; every choice has consequences
-5. **Debrief** — missed threats detonate later as breaches; false alarms breed resentment
+1. **Triage** — swipe through alerts; most are noise, a few are civilization-ending
+2. **Investigate** — pull evidence from the four surfaces; discover that your "data exfil" alert was just Bob in Finance downloading his own performance review
+3. **Connect dots** — pin clues to a case board, link them to form hypotheses, question all of your life choices
+4. **Decide** — ignore, warn, escalate, terminate; every choice has consequences; "ignore" has consequences too, you'll find out
+5. **Debrief** — missed threats detonate later as breaches; false alarms breed the kind of resentment that gets you disinvited from All-Hands
 
 ## Status
 
-Early prototype. The full run is 100 days across four quarters: triage → pin → decide → debrief → next day. Eight hand-authored anchor days (days 1–5, 10, 25, 50) carry the big cases — shadow AI, shadow cloud, accidental leak, deliberate leak, exposed API, two insider-exfil arcs. The other ~92 days are procedurally generated minor cases at fractional meter weight, so anchors are the high-stakes moments and filler days are maintenance. Trust at zero or risk at one hundred ends the run. State persists to IndexedDB.
+Early prototype. The full run is 100 days across four quarters, because apparently *five* was too easy and *infinite* seemed ambitious.
+
+Eight hand-authored anchor days (days 1–5, 10, 25, 50) carry the high-stakes cases — shadow AI piping PII into an unnamed LLM, shadow cloud billed silently for 11 months, accidental leaks, deliberate leaks (those are different, legally, which you will explain to HR again), an exposed API that's been open since Q1, and two multi-day insider-exfil arcs that unfold across consecutive days because drama needs an arc.
+
+The other ~92 days are procedurally generated minor cases at fractional weight, because you can't have a *crisis* every single day. Some days you're just approving $200 SaaS subscriptions and wondering how `claude-pro-team` made it past procurement. This is also the job.
+
+Trust at zero or risk at one hundred ends the run. The board does not send a card.
+
+State persists to IndexedDB, because your browser is the only infrastructure you're allowed.
 
 Full design in [`SPEC.md`](SPEC.md). Operating notes for Claude Code in [`CLAUDE.md`](CLAUDE.md).
 
-## Run it
+## Run it locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open the dev URL on your phone or in a narrow browser window. The app caps at 28rem wide — it's portrait-only on purpose.
+Open the dev URL on your phone or in a narrow browser window. The app caps at 28rem wide. Portrait only. Like your career trajectory at Helix Corp.
 
-## Stack (planned)
+## Stack
 
 - **Frontend**: React + Vite + Tailwind, ships as a static PWA
-- **State**: Zustand + IndexedDB
-- **Hosting**: Cloudflare Pages / Vercel
-- **No backend** for v1 — cases are authored as JSON in the repo
+- **State**: Zustand + IndexedDB — the only database you'll ever get approved
+- **Hosting**: Cloudflare Pages / Vercel — no backend, no ops tickets, no oncall rotation at 3am
+- **Cases**: hand-curated JSON in the repo — because the only thing worse than a mystery is a broken mystery
 
-## Authoring with Gemma
+## A note on "No Backend"
 
-Hand-authoring detective cases is expensive. Procedural generation at *runtime* makes patterns feel cheap. Middle path: use **Gemma 4 E4B** locally to draft hundreds of candidate cases — emails, log lines, expense justifications, department dialog — then hand-curate the best into the static dataset that ships with the game. LLM creative leverage at authoring time, deterministic gameplay at runtime.
+There is no server. No database. No API. No microservices. No Kubernetes cluster slowly incurring $4,200/month in egress charges you only discover on Day 25. The entire game ships as static files. This is intentional. It is also, frankly, aspirational compared to the infrastructure decisions you'll be investigating in-game.
+
+## Authoring with Gemma (our one use of AI that we'll admit to)
+
+Hand-authoring detective cases is expensive. Runtime LLM generation makes patterns feel cheap and introduces the kind of non-determinism that's very funny in a chatbot and catastrophic in a court exhibit. So: middle path. **Gemma 4 E4B** running locally drafts candidate cases — emails, log lines, expense justifications, the kind of passive-aggressive HR communication that only happens when someone knows they're being watched — and a human curates the best into the static dataset. LLM at authoring time. Deterministic suspicion at runtime. Just like the SIEM.
 
 ## Roadmap
 
 - [x] Game design spec
 - [x] Vite + Tailwind scaffold
-- [x] Triage inbox
+- [x] Triage inbox — swipe through alerts, pretend most are noise
 - [x] Logs surface (filter + pin-to-case)
-- [x] Case board (pinned clues view)
-- [x] Decision UI + verdict logic (trust / risk / morale meters, 5 outcome tiers)
-- [x] IndexedDB persistence (rehydrate on load, reset action behind confirm)
-- [x] Eight hand-authored anchor cases (days 1–5, 10, 25, 50 — six archetypes covered)
-- [x] Procedural filler-day generator (days 6-100 minus anchors; deterministic, weighted at 0.25)
-- [x] Day-end flow + game-over (trust 0 / risk 100) + win (survive 100 days)
-- [ ] Gemma case-authoring pipeline
-- [x] Emails surface (second investigation lens — required clues now span logs + emails)
-- [ ] Expenses + Traffic surfaces (currently noise-only — referenced by alerts, no dedicated UI)
-- [x] Persistence schema — partialize so content updates flow to returning players
+- [x] Case board (pinned clues view — your evidence wall, minus the red string)
+- [x] Decision UI + verdict logic (trust / risk / morale meters, 5 outcome tiers including "you were technically right but everyone hates you now")
+- [x] IndexedDB persistence (rehydrate on load; reset action gated behind a confirm dialog you will click too fast someday)
+- [x] Eight hand-authored anchor cases (days 1–5, 10, 25, 50 — six archetypes, zero sympathy)
+- [x] Procedural filler-day generator (days 6–100 minus anchors; deterministic, weighted at 0.25 so the filler can't end your run but will waste your time, which is accurate)
+- [x] Day-end flow + game-over (trust 0 = board loses confidence; risk 100 = breach; both feel bad)
+- [x] Win condition: survive 100 days; receive no commendation, only the knowledge that you survived
+- [x] Emails surface (second investigation lens — because one log is evidence, two is a pattern, three is a disciplinary hearing)
+- [x] Expenses + Traffic surfaces (forensic accounting and network flow analysis — now with 40% more disappointment)
+- [x] Multi-day arcs — some investigations span days; evidence pins carry across the arc so you don't have to remember anything yourself
+- [x] Per-quarter meter regression — trust and risk drift back toward baseline every 25 days, because institutional memory is short and your wins don't compound
+- [x] Persistence schema — partialize so content updates don't wipe returning players' saves (learned this the hard way; you don't need to know more)
 - [x] Deploy to GitHub Pages (`babanomania.github.io/shadow-it`)
-- [ ] Swipe gestures for triage (mobile polish — buttons-only for now)
+- [ ] Gemma authoring pipeline — so we can generate 500 cases and feel appropriately bad about all of them
+- [ ] Swipe gestures for triage (mobile polish — tap buttons for now, swipe when we've earned it)
+- [ ] Remaining 92 anchor cases (days 6–9, 11–24, 26–49, 51–100 — yes, this is a lot; no, we don't regret the 100-day decision)
+- [ ] Audio — optional, off by default, because open-plan offices are already a hostile environment
 
 ## License
 
-TBD.
+TBD. Like most of your security policies.
