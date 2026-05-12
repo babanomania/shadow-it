@@ -6,6 +6,14 @@
 
 > A mobile-browser detective/strategy game where you play head of governance & security at a fast-growing tech company. Departments break the rules behind your back. You catch them — or you don't.
 
+<p align="center">
+  <a href="https://babanomania.github.io/shadow-it/">
+    <img src="https://img.shields.io/badge/%E2%96%B6%20Play%20Now-shadow--it-F59E0B?style=for-the-badge&labelColor=0b1220" alt="Play Now" />
+  </a>
+</p>
+
+> Best on mobile (portrait). Works in any modern browser — no install, no account.
+
 **Papers Please × Splunk × office politics, in 3-minute commute sessions.**
 
 ## What is it?
@@ -63,7 +71,7 @@ Hand-authoring detective cases is expensive. Procedural generation at *runtime* 
 - [x] Emails surface (second investigation lens — required clues now span logs + emails)
 - [ ] Expenses + Traffic surfaces (currently noise-only — referenced by alerts, no dedicated UI)
 - [x] Persistence schema — partialize so content updates flow to returning players
-- [ ] PWA polish + deploy
+- [x] Deploy to GitHub Pages (`babanomania.github.io/shadow-it`)
 - [ ] Swipe gestures for triage (mobile polish — buttons-only for now)
 
 ## License

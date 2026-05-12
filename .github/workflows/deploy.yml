@@ -36,7 +36,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_BASE_PATH: /c/
+          VITE_BASE_PATH: /shadow-it/
 
       # SPA fallback so deep links / refreshes still hit index.html
       - name: Add 404.html for SPA fallback
