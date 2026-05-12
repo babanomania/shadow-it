@@ -64,6 +64,9 @@ export interface Case {
   briefing: string;
   requiredClueIds: string[];
   correctAction: ActionType;
+  /** Meter-impact multiplier. Anchor (hand-authored) cases default to 1.
+   *  Procedural filler cases run at ~0.25 so 100 days don't pin the meters. */
+  weight?: number;
   narratives: Record<OutcomeTier, string>;
 }
 

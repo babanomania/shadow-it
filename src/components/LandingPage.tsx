@@ -6,8 +6,8 @@ const FEATURES: { title: string; body: string }[] = [
     body: 'Logs, email, expenses, traffic. The story only emerges when you read all of them.',
   },
   {
-    title: 'Five hand-authored cases',
-    body: 'Shadow AI, side-cloud, accidental leak, exposed API, insider exfil. One per day.',
+    title: 'A 100-day run, in four quarters',
+    body: 'Hand-authored anchor cases on the big days; procedural noise and minor calls between them.',
   },
   {
     title: 'Three-minute commute sessions',
@@ -153,7 +153,7 @@ export function LandingPage({ onStart }: { onStart: () => void }) {
           <span className="text-slate-400">ignore</span>,{' '}
           <span className="text-slate-200">warn</span>,{' '}
           <span className="text-amber-400">escalate</span>,{' '}
-          <span className="text-red-400">terminate</span>. Survive the quarter without a breach — or a mutiny.
+          <span className="text-red-400">terminate</span>. Survive 100 days without a breach — or a mutiny.
         </p>
 
         {/* Terminal preview */}
@@ -213,7 +213,7 @@ export function LandingPage({ onStart }: { onStart: () => void }) {
         {/* Footer */}
         <div className="mt-auto pt-4">
           <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-slate-700">
-            <span>5 days · 5 cases</span>
+            <span>100 days · 4 quarters</span>
             <span>·</span>
             <span>early prototype</span>
           </div>

@@ -80,6 +80,14 @@ export function evaluate(
     perpMoraleDelta = -10 * distance;
   }
 
+  // Procedural filler cases run at fractional weight so 100 days of
+  // routine decisions don't pin the meters at 0/100. Anchor cases
+  // (default weight 1) keep their full swing.
+  const w = caseDef.weight ?? 1;
+  trustDelta = Math.round(trustDelta * w);
+  riskDelta = Math.round(riskDelta * w);
+  perpMoraleDelta = Math.round(perpMoraleDelta * w);
+
   return {
     caseId: caseDef.id,
     day,

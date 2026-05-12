@@ -1,4 +1,13 @@
 import { useStore } from '../store';
+import { isAnchorDay } from '../data';
+
+function dayStamp(day: number): { quarter: number; week: number; dayOfWeek: number } {
+  const quarter = Math.ceil(day / 25);
+  const dayInQuarter = ((day - 1) % 25) + 1;
+  const week = Math.ceil(dayInQuarter / 5);
+  const dayOfWeek = ((dayInQuarter - 1) % 5) + 1;
+  return { quarter, week, dayOfWeek };
+}
 
 function MeterBar({
   value,
@@ -56,9 +65,26 @@ export function TopBar({ onExit }: { onExit?: () => void }) {
             helix-corp
           </span>
           <span className="text-[10px] font-mono text-slate-700">·</span>
-          <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-slate-400">
-            day {day}
+          {(() => {
+            const { quarter, week, dayOfWeek } = dayStamp(day);
+            return (
+              <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-slate-400 tabular-nums">
+                q{quarter}·w{week}·d{dayOfWeek}
+              </span>
+            );
+          })()}
+          <span className="text-[10px] font-mono text-slate-700">·</span>
+          <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-slate-500 tabular-nums">
+            {day}/100
           </span>
+          {isAnchorDay(day) && (
+            <span
+              className="text-[9px] font-mono uppercase tracking-[0.2em] text-amber-400 border border-amber-500/30 rounded px-1 py-px"
+              title="Anchor day — hand-authored case"
+            >
+              anchor
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5">

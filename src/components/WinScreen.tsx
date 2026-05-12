@@ -24,12 +24,13 @@ export function WinScreen({ onExit }: { onExit?: () => void }) {
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         <div className="border border-emerald-700/40 rounded-lg p-4 bg-emerald-900/10">
           <div className="text-[10px] uppercase tracking-[0.3em] text-emerald-400 font-mono mb-2">
-            quarter complete
+            run complete · 100 days
           </div>
           <h1 className="text-lg font-medium text-slate-100 mb-2">You survived.</h1>
           <p className="text-sm text-slate-300 leading-relaxed">
-            Five days, five decisions, no breach above the fold. The board signs off on
-            another quarter. Whether they&apos;d hire you again is a different question.
+            Four quarters, one hundred days, no breach above the fold. The board signs
+            off and renews your mandate. Whether they&apos;d hire you again is a different
+            question.
           </p>
         </div>
 
@@ -75,7 +76,7 @@ export function WinScreen({ onExit }: { onExit?: () => void }) {
           {confirmReset ? (
             <div className="space-y-2">
               <p className="text-[11px] text-slate-500 text-center font-mono uppercase tracking-wider">
-                start a new quarter?
+                start a new run?
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <button
@@ -101,7 +102,7 @@ export function WinScreen({ onExit }: { onExit?: () => void }) {
                 onClick={() => setConfirmReset(true)}
                 className="w-full py-3 text-[11px] uppercase tracking-[0.2em] text-emerald-300 border border-emerald-700/40 rounded font-mono active:bg-emerald-900/30"
               >
-                new quarter
+                new run
               </button>
               {onExit && (
                 <button
