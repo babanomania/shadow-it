@@ -1,41 +1,189 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 480" width="1280" height="480" role="img" aria-label="shadow-it — a detective game x SIEM x corporate espionage, for mobile browsers">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 480" width="1280" height="480" role="img" aria-label="Shadow IT — a corporate security investigation game">
   <defs>
-    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
-      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#1e293b" stroke-width="0.4"/>
     </pattern>
+    <linearGradient id="log-fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="60%" stop-color="#060c16" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#060c16" stop-opacity="1"/>
+    </linearGradient>
+    <linearGradient id="title-fade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </linearGradient>
   </defs>
 
+  <!-- Base + grid -->
   <rect width="1280" height="480" fill="#0b1220"/>
   <rect width="1280" height="480" fill="url(#grid)"/>
 
-  <g font-family="ui-monospace, 'SF Mono', Menlo, Monaco, monospace" font-size="13">
-    <text x="1200" y="42" text-anchor="end" fill="#475569">helix-corp · prod</text>
-    <text x="1200" y="62" text-anchor="end" fill="#475569">9 departments · 247 alerts today</text>
-    <circle cx="1115" cy="80" r="4" fill="#10b981"/>
-    <text x="1200" y="84" text-anchor="end" fill="#94a3b8">live</text>
+  <!-- Ambient glows -->
+  <ellipse cx="280" cy="270" rx="340" ry="230" fill="#f59e0b" fill-opacity="0.04"/>
+  <ellipse cx="1060" cy="200" rx="300" ry="220" fill="#ef4444" fill-opacity="0.04"/>
+
+  <!-- ── TOP SYSTEM BAR ─────────────────────────────── -->
+  <rect width="1280" height="36" fill="#060c16"/>
+  <line x1="0" y1="36" x2="1280" y2="36" stroke="#1e293b" stroke-width="1"/>
+
+  <g font-family="ui-monospace, 'SF Mono', Menlo, Monaco, monospace" font-size="11">
+    <!-- live pulse -->
+    <circle cx="16" cy="18" r="3.5" fill="#10b981"/>
+    <text x="28" y="22" fill="#10b981" letter-spacing="1.5">LIVE</text>
+    <text x="64"  y="22" fill="#1e293b">│</text>
+    <text x="76"  y="22" fill="#475569">HELIX-CORP · SECURITY OPERATIONS CENTER</text>
+    <text x="370" y="22" fill="#1e293b">│</text>
+    <text x="382" y="22" fill="#475569">SID:0xA3F2D1</text>
+    <text x="474" y="22" fill="#1e293b">│</text>
+    <text x="486" y="22" fill="#475569">Q3 WK2</text>
+    <text x="546" y="22" fill="#1e293b">│</text>
+    <text x="558" y="22" fill="#475569">ANOMALIES: <tspan fill="#ef4444" font-weight="700">7</tspan></text>
+    <!-- right -->
+    <text x="1264" y="22" text-anchor="end" fill="#475569">BOARD TRUST: <tspan fill="#f59e0b">60</tspan>/100</text>
+    <text x="1140" y="22" text-anchor="end" fill="#1e293b">│</text>
+    <rect x="1152" y="9" width="62" height="16" rx="2" fill="#ef4444" fill-opacity="0.12" stroke="#ef4444" stroke-opacity="0.4" stroke-width="0.5"/>
+    <text x="1183" y="21" text-anchor="middle" fill="#ef4444" font-size="9" letter-spacing="1.5">TLP:RED</text>
   </g>
 
-  <g font-family="ui-monospace, 'SF Mono', Menlo, Monaco, monospace">
-    <text x="80" y="180" font-size="96" font-weight="700" fill="#e2e8f0"><tspan fill="#64748b">$ </tspan>Shadow<tspan fill="#f59e0b">_</tspan>IT
+  <!-- ── LEFT PANEL ─────────────────────────────────── -->
+  <g transform="translate(64, 52)" font-family="ui-monospace, 'SF Mono', Menlo, Monaco, monospace">
+
+    <!-- Amber glow behind title -->
+    <rect x="-20" y="40" width="680" height="200" fill="url(#title-fade)"/>
+
+    <!-- Classification stamp -->
+    <rect x="0" y="0" width="152" height="22" rx="2" fill="none" stroke="#ef4444" stroke-opacity="0.5" stroke-width="1"/>
+    <text x="76" y="15" text-anchor="middle" font-size="10" fill="#ef4444" fill-opacity="0.7" letter-spacing="4">CLASSIFIED</text>
+
+    <!-- Project label -->
+    <text x="2" y="52" font-size="11" fill="#334155" letter-spacing="3">PROJECT CODENAME</text>
+
+    <!-- Main title line 1 -->
+    <text y="132" font-size="82" font-weight="700" letter-spacing="-2">
+      <tspan fill="#2d3f55">///</tspan><tspan fill="#e2e8f0"> SHADOW</tspan>
     </text>
-    <text x="80" y="225" font-size="20" fill="#94a3b8">a detective game × SIEM × corporate espionage. for mobile browsers.</text>
+
+    <!-- Main title line 2 -->
+    <text y="210" font-size="82" font-weight="700" letter-spacing="-2">
+      <tspan fill="#f59e0b">_</tspan><tspan fill="#e2e8f0">IT</tspan><tspan font-size="15" fill="#2d3f55" letter-spacing="1">   // v0.0.1-alpha</tspan>
+    </text>
+
+    <!-- Tagline -->
+    <text x="2" y="242" font-size="13" fill="#475569" letter-spacing="0.5">detect · investigate · decide — survive the quarter without a breach</text>
+
+    <!-- Stat pills -->
+    <g transform="translate(0, 262)" font-size="11">
+      <rect width="96" height="24" rx="3" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+      <circle cx="14" cy="12" r="3" fill="#10b981"/>
+      <text x="26" y="16" fill="#94a3b8">5 CASES</text>
+
+      <rect x="106" width="118" height="24" rx="3" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+      <circle cx="120" cy="12" r="3" fill="#3b82f6"/>
+      <text x="132" y="16" fill="#94a3b8">4 SURFACES</text>
+
+      <rect x="234" width="114" height="24" rx="3" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+      <circle cx="248" cy="12" r="3" fill="#f59e0b"/>
+      <text x="260" y="16" fill="#94a3b8">NO BACKEND</text>
+
+      <rect x="358" width="90" height="24" rx="3" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+      <circle cx="372" cy="12" r="3" fill="#8b5cf6"/>
+      <text x="384" y="16" fill="#94a3b8">STATIC</text>
+    </g>
+
+    <!-- Threat bars -->
+    <g transform="translate(2, 310)" font-size="10" fill="#334155" letter-spacing="2">
+      <text y="0">BOARD TRUST</text>
+      <rect x="0" y="6" width="220" height="3" rx="1.5" fill="#1e293b"/>
+      <rect x="0" y="6" width="132" height="3" rx="1.5" fill="#10b981"/>
+      <text x="228" y="12" fill="#475569" letter-spacing="0">60 / 100</text>
+
+      <text x="310" y="0">BREACH RISK</text>
+      <rect x="310" y="6" width="220" height="3" rx="1.5" fill="#1e293b"/>
+      <rect x="310" y="6" width="88" height="3" rx="1.5" fill="#ef4444"/>
+      <text x="538" y="12" fill="#475569" letter-spacing="0">40 / 100</text>
+    </g>
   </g>
 
-  <g transform="translate(80, 270)" font-family="ui-monospace, 'SF Mono', Menlo, monospace">
-    <rect x="-16" y="-32" width="1140" height="180" fill="#0f172a" stroke="#1e293b" stroke-width="1" rx="6"/>
-    <text x="0" y="-12" font-size="11" fill="#475569" letter-spacing="2">LIVE FEED · TODAY</text>
+  <!-- Vertical divider -->
+  <line x1="718" y1="36" x2="718" y2="480" stroke="#1e293b" stroke-width="1"/>
 
-    <g font-size="15">
-      <text y="20" fill="#64748b">14:02:11  auth.login       user=alice@helix.corp  ok</text>
-      <text y="48" fill="#64748b">14:02:43  expense.charge   vendor="adobe creative cloud"  $52.99</text>
+  <!-- ── RIGHT PANEL: SIEM FEED ─────────────────────── -->
+  <g transform="translate(734, 36)" font-family="ui-monospace, 'SF Mono', Menlo, Monaco, monospace">
 
-      <rect x="-16" y="60" width="1140" height="28" fill="#f59e0b" fill-opacity="0.08"/>
-      <text y="78" fill="#f59e0b">14:03:01  api.export       table=customers  rows=12,481  ⚠ marketing-bot</text>
+    <!-- Panel background -->
+    <rect x="0" y="0" width="546" height="444" fill="#060c16"/>
 
-      <text y="106" fill="#64748b">14:03:12  auth.login       user=bob@helix.corp  ok</text>
+    <!-- Panel header bar -->
+    <rect x="0" y="0" width="546" height="30" fill="#080f1a"/>
+    <line x1="0" y1="30" x2="546" y2="30" stroke="#1e293b" stroke-width="1"/>
+    <text x="12" y="19" font-size="10" fill="#334155" letter-spacing="2">SIEM FEED · HELIX-PROD · LIVE</text>
+    <circle cx="526" cy="15" r="3" fill="#10b981" fill-opacity="0.8"/>
 
-      <rect x="-16" y="118" width="1140" height="28" fill="#ef4444" fill-opacity="0.10"/>
-      <text y="136" fill="#ef4444">14:03:29  traffic.egress   dest=api.unknown-llm.io  4.2GB  ✗ exfil</text>
-    </g>
+    <!-- Column headers -->
+    <text x="12" y="50" font-size="10" fill="#1e293b" letter-spacing="1">TIME       SERVICE           EVENT</text>
+    <line x1="0" y1="56" x2="546" y2="56" stroke="#1e293b" stroke-width="0.5"/>
+
+    <!-- Row helper: each row is 28px, starts at y=60 -->
+
+    <!-- info -->
+    <text x="12" y="74" font-size="11" fill="#2d3f55">09:04:12   auth              login user=alice@helix.corp mfa=ok</text>
+
+    <!-- warn -->
+    <rect x="0"  y="79" width="3" height="26" fill="#f59e0b"/>
+    <rect x="3"  y="79" width="543" height="26" fill="#f59e0b" fill-opacity="0.05"/>
+    <text x="12" y="97" font-size="11" fill="#f59e0b">09:14:03   expense           vendor="claude-pro-team" $200.00</text>
+
+    <!-- info -->
+    <text x="12" y="123" font-size="11" fill="#2d3f55">09:28:19   traffic.egress    dest=segment.io 48MB proto=https</text>
+
+    <!-- critical -->
+    <rect x="0"  y="128" width="3" height="26" fill="#ef4444"/>
+    <rect x="3"  y="128" width="543" height="26" fill="#ef4444" fill-opacity="0.07"/>
+    <text x="12" y="146" font-size="11" fill="#ef4444">14:03:29   traffic.egress    dest=api.unknown-llm.io 4.2GB</text>
+
+    <!-- info -->
+    <text x="12" y="172" font-size="11" fill="#2d3f55">14:08:51   mail              to=personalmail.com subj=fwd:records</text>
+
+    <!-- warn -->
+    <rect x="0"  y="177" width="3" height="26" fill="#f59e0b"/>
+    <rect x="3"  y="177" width="543" height="26" fill="#f59e0b" fill-opacity="0.05"/>
+    <text x="12" y="195" font-size="11" fill="#f59e0b">08:47:09   github            gist.publish visibility=public key=live</text>
+
+    <!-- info -->
+    <text x="12" y="221" font-size="11" fill="#2d3f55">13:19:55   legal.dpa         partner=atlas-bridge-llc result=NOT_FOUND</text>
+
+    <!-- critical -->
+    <rect x="0"  y="226" width="3" height="26" fill="#ef4444"/>
+    <rect x="3"  y="226" width="543" height="26" fill="#ef4444" fill-opacity="0.07"/>
+    <text x="12" y="244" font-size="11" fill="#ef4444">23:14:02   hr.export         table=employees rows=482 size=2.1GB</text>
+
+    <!-- info -->
+    <text x="12" y="270" font-size="11" fill="#2d3f55">23:18:39   traffic.egress    dest=consumer-drive.com/u/t-aguilar 2.1GB</text>
+
+    <!-- critical -->
+    <rect x="0"  y="275" width="3" height="26" fill="#ef4444"/>
+    <rect x="3"  y="275" width="543" height="26" fill="#ef4444" fill-opacity="0.07"/>
+    <text x="12" y="293" font-size="11" fill="#ef4444">10:28:50   secret-scanner    pattern=api-token gist_id=8a2f1d calls=8</text>
+
+    <!-- info -->
+    <text x="12" y="319" font-size="11" fill="#2d3f55">08:13:09   hr                resign user=tomas@helix.corp last_day=8d</text>
+
+    <!-- warn -->
+    <rect x="0"  y="324" width="3" height="26" fill="#f59e0b"/>
+    <rect x="3"  y="324" width="543" height="26" fill="#f59e0b" fill-opacity="0.05"/>
+    <text x="12" y="342" font-size="11" fill="#f59e0b">09:12:44   api.token         create ttl=null partner=external scope=r</text>
+
+    <!-- info -->
+    <text x="12" y="368" font-size="11" fill="#2d3f55">14:02:11   auth              login user=bob@helix.corp src=10.0.5.2</text>
+
+    <!-- critical -->
+    <rect x="0"  y="373" width="3" height="26" fill="#ef4444"/>
+    <rect x="3"  y="373" width="543" height="26" fill="#ef4444" fill-opacity="0.07"/>
+    <text x="12" y="391" font-size="11" fill="#ef4444">11:42:50   iam.role          create trust=external ttl=null</text>
+
+    <!-- fade bottom -->
+    <rect x="0" y="360" width="546" height="84" fill="url(#log-fade)"/>
+
+    <!-- panel border -->
+    <rect x="0" y="0" width="546" height="444" fill="none" stroke="#1e293b" stroke-width="1"/>
   </g>
 </svg>
