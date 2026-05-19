@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M 28 0 L 0 0 0 28" fill="none" stroke="#1e293b" stroke-width="0.4"/>
+    </pattern>
+    <linearGradient id="vignette" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#060c16" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#060c16" stop-opacity="0.8"/>
+    </linearGradient>
+    <linearGradient id="amber-glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#ef4444" stop-opacity="0.04"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base -->
+  <rect width="1200" height="630" fill="#0b1220"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect width="1200" height="630" fill="url(#amber-glow)"/>
+
+  <!-- Ambient glows -->
+  <ellipse cx="200" cy="400" rx="500" ry="300" fill="#f59e0b" fill-opacity="0.05"/>
+  <ellipse cx="1050" cy="200" rx="400" ry="280" fill="#ef4444" fill-opacity="0.06"/>
+
+  <!-- Top system bar -->
+  <rect width="1200" height="40" fill="#060c16"/>
+  <line x1="0" y1="40" x2="1200" y2="40" stroke="#1e293b" stroke-width="1"/>
+
+  <g font-family="ui-monospace, 'SF Mono', Menlo, Monaco, monospace" font-size="12">
+    <circle cx="18" cy="20" r="4" fill="#ef4444"/>
+    <text x="32" y="25" fill="#ef4444" letter-spacing="2">INCIDENT ACTIVE</text>
+    <text x="200" y="25" fill="#1e293b">│</text>
+    <text x="214" y="25" fill="#475569">HELIX-CORP · SECURITY OPERATIONS</text>
+    <text x="500" y="25" fill="#1e293b">│</text>
+    <text x="514" y="25" fill="#475569">ANOMALIES: <tspan fill="#ef4444" font-weight="700">7</tspan></text>
+    <text x="1185" y="25" text-anchor="end" fill="#475569">BOARD TRUST: <tspan fill="#f59e0b">60</tspan>/100</text>
+  </g>
+
+  <!-- Main incident alert block -->
+  <rect x="60" y="72" width="720" height="4" fill="#ef4444" rx="2"/>
+
+  <g font-family="ui-monospace, 'SF Mono', Menlo, Monaco, monospace">
+    <!-- Incident label -->
+    <text x="60" y="128" font-size="13" fill="#ef4444" letter-spacing="4">// SECURITY INCIDENT · SEVERITY: CRITICAL</text>
+
+    <!-- Big hook -->
+    <text x="60" y="218" font-size="68" font-weight="700" fill="#f1f5f9" letter-spacing="-1.5">482 employee</text>
+    <text x="60" y="300" font-size="68" font-weight="700" fill="#f1f5f9" letter-spacing="-1.5">records just left</text>
+    <text x="60" y="382" font-size="68" font-weight="700" fill="#f59e0b" letter-spacing="-1.5">the building.</text>
+
+    <!-- Sub copy -->
+    <text x="62" y="436" font-size="18" fill="#64748b">You have 100 days to catch the insider before the board finds out.</text>
+    <text x="62" y="462" font-size="18" fill="#475569">Most days you won't. That's the job.</text>
+  </g>
+
+  <!-- Vertical divider -->
+  <line x1="840" y1="40" x2="840" y2="630" stroke="#1e293b" stroke-width="1"/>
+
+  <!-- Right panel — fake SIEM -->
+  <g transform="translate(856, 56)" font-family="ui-monospace, 'SF Mono', Menlo, Monaco, monospace">
+    <text x="0" y="0" font-size="10" fill="#334155" letter-spacing="2">SIEM · HELIX-PROD</text>
+    <line x1="0" y1="10" x2="324" y2="10" stroke="#1e293b" stroke-width="0.5"/>
+
+    <!-- critical row -->
+    <rect x="0" y="20" width="3" height="26" fill="#ef4444"/>
+    <rect x="3" y="20" width="321" height="26" fill="#ef4444" fill-opacity="0.07"/>
+    <text x="12" y="38" font-size="11" fill="#ef4444">23:14:02  hr.export  rows=482 size=2.1GB</text>
+
+    <!-- info -->
+    <text x="12" y="72" font-size="11" fill="#2d3f55">23:18:39  traffic.egress  dest=consumer-drive.com</text>
+
+    <!-- warn -->
+    <rect x="0" y="82" width="3" height="26" fill="#f59e0b"/>
+    <rect x="3" y="82" width="321" height="26" fill="#f59e0b" fill-opacity="0.05"/>
+    <text x="12" y="100" font-size="11" fill="#f59e0b">08:47:09  github  gist.publish key=live</text>
+
+    <!-- info -->
+    <text x="12" y="134" font-size="11" fill="#2d3f55">09:04:12  auth  login user=alice@helix.corp</text>
+
+    <!-- critical -->
+    <rect x="0" y="144" width="3" height="26" fill="#ef4444"/>
+    <rect x="3" y="144" width="321" height="26" fill="#ef4444" fill-opacity="0.07"/>
+    <text x="12" y="162" font-size="11" fill="#ef4444">14:03:29  traffic.egress  dest=api.unknown-llm.io 4.2GB</text>
+
+    <!-- warn -->
+    <rect x="0" y="178" width="3" height="26" fill="#f59e0b"/>
+    <rect x="3" y="178" width="321" height="26" fill="#f59e0b" fill-opacity="0.05"/>
+    <text x="12" y="196" font-size="11" fill="#f59e0b">09:14:03  expense  vendor="claude-pro-team" $200</text>
+
+    <!-- info -->
+    <text x="12" y="230" font-size="11" fill="#2d3f55">13:19:55  legal.dpa  partner=atlas NOT_FOUND</text>
+
+    <!-- critical -->
+    <rect x="0" y="240" width="3" height="26" fill="#ef4444"/>
+    <rect x="3" y="240" width="321" height="26" fill="#ef4444" fill-opacity="0.07"/>
+    <text x="12" y="258" font-size="11" fill="#ef4444">10:28:50  secret-scanner  api-token gist calls=8</text>
+
+    <!-- info -->
+    <text x="12" y="292" font-size="11" fill="#2d3f55">08:13:09  hr  resign user=tomas@helix.corp last_day=8d</text>
+
+    <!-- warn -->
+    <rect x="0" y="302" width="3" height="26" fill="#f59e0b"/>
+    <rect x="3" y="302" width="321" height="26" fill="#f59e0b" fill-opacity="0.05"/>
+    <text x="12" y="320" font-size="11" fill="#f59e0b">09:12:44  api.token  ttl=null scope=rw partner=ext</text>
+
+    <!-- critical -->
+    <rect x="0" y="336" width="3" height="26" fill="#ef4444"/>
+    <rect x="3" y="336" width="321" height="26" fill="#ef4444" fill-opacity="0.07"/>
+    <text x="12" y="354" font-size="11" fill="#ef4444">11:42:50  iam.role  create trust=external ttl=null</text>
+
+    <!-- info -->
+    <text x="12" y="388" font-size="11" fill="#2d3f55">14:02:11  auth  login user=bob@helix.corp src=10.0.5.2</text>
+
+    <!-- warn -->
+    <rect x="0" y="398" width="3" height="26" fill="#f59e0b"/>
+    <rect x="3" y="398" width="321" height="26" fill="#f59e0b" fill-opacity="0.05"/>
+    <text x="12" y="416" font-size="11" fill="#f59e0b">09:28:19  traffic.egress  dest=segment.io 48MB</text>
+  </g>
+
+  <!-- Bottom bar -->
+  <rect x="0" y="574" width="1200" height="56" fill="#060c16"/>
+  <line x1="0" y1="574" x2="1200" y2="574" stroke="#1e293b" stroke-width="1"/>
+
+  <g font-family="ui-monospace, 'SF Mono', Menlo, Monaco, monospace">
+    <!-- game name -->
+    <text x="60" y="609" font-size="22" font-weight="700">
+      <tspan fill="#2d3f55">///</tspan><tspan fill="#94a3b8"> SHADOW </tspan><tspan fill="#f59e0b">IT</tspan>
+    </text>
+    <text x="230" y="609" fill="#1e293b" font-size="22">│</text>
+    <text x="248" y="609" font-size="13" fill="#475569" letter-spacing="0.5">detect · investigate · decide · survive 100 days</text>
+    <!-- CTA -->
+    <rect x="980" y="584" width="160" height="32" rx="3" fill="#f59e0b" fill-opacity="0.12" stroke="#f59e0b" stroke-opacity="0.5" stroke-width="1"/>
+    <text x="1060" y="605" text-anchor="middle" font-size="12" fill="#f59e0b" letter-spacing="2">PLAY NOW →</text>
+  </g>
+</svg>
